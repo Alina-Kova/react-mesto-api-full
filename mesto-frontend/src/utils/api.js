@@ -106,10 +106,12 @@ export default class Api {
     }
 }
 
+let jwt = localStorage.getItem('jwt');
+
 export const api = new Api({
 	baseUrl: 'https://api.alina.mesto.nomoredomains.monster',
 	headers: {
-		authorization: '06cbf485-9ed1-4992-a1f8-a932823be70b',
+		authorization: `${jwt}`,
 		'Content-Type': 'application/json'
 	}
 })

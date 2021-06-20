@@ -37,13 +37,13 @@ export const authorize = (email, password) => {
 };
 
 // отправляем запрос и получаем информацию о пользователе в шапку
-export const getPersonalData = (token) => {
+export const getPersonalData = (JWT) => {
     return fetch(`${BASE_URL}/users/me`, {
         method: 'GET',
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
+            'Authorization': `${JWT}`
         }
     })
         .then(getResponse)
