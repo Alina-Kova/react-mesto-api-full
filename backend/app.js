@@ -34,11 +34,11 @@ app.use(requestLogger); // подключаем логгер запросов
 app.use('/cards', auth, cardsRoutes);
 app.use('/users', auth, usersRoutes);
 
-app.get('/crash-test', () => {
-  setTimeout(() => {
-    throw new Error('Сервер сейчас упадёт');
-  }, 0);
-});
+// app.get('/crash-test', () => {
+//   setTimeout(() => {
+//     throw new Error('Сервер сейчас упадёт');
+//   }, 0);
+// });
 
 app.post('/signin', celebrate({
   body: Joi.object().keys({
