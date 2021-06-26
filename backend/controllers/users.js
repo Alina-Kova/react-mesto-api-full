@@ -130,7 +130,7 @@ module.exports.login = (req, res, next) => {
       // аутентификация успешна! пользователь в переменной user
       // создадим токен
       const token = jwt.sign(
-        { _id: user._id },
+        { _id: user._id, email: user.email },
         NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret',
         { expiresIn: '7d' },
       );
