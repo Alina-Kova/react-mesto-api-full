@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -8,7 +9,6 @@ const usersRoutes = require('./routes/users');
 const { login, createUser } = require('./controllers/users');
 const auth = require('./middlewares/auth');
 const NotFoundError = require('./errors/not-found-err');
-require('dotenv').config();
 
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 
@@ -66,7 +66,7 @@ app.use(errorLogger); // подключаем логгер ошибок
 app.use(errors());
 
 // обрабатываем ошибку 404
-app.use(() => {
+app.all('*', () => {
   throw new NotFoundError('Карточка или пользователь не найден.');
 });
 // обрабатываем ошибку 500
