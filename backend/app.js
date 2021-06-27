@@ -1,16 +1,16 @@
-require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
-const cors = require('cors');
-const cookieParser = require('cookie-parser');
 const { errors, celebrate, Joi } = require('celebrate');
+const cors = require('cors');
 const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
 const cardsRoutes = require('./routes/cards');
 const usersRoutes = require('./routes/users');
 const { login, createUser } = require('./controllers/users');
+const { requestLogger, errorLogger } = require('./middlewares/logger');
 const auth = require('./middlewares/auth');
 const NotFoundError = require('./errors/not-found-err');
-const { requestLogger, errorLogger } = require('./middlewares/logger');
+require('dotenv').config();
 
 // Слушаем 3000 порт
 const { PORT = 3000 } = process.env;
@@ -67,8 +67,8 @@ app.use(errorLogger); // подключаем логгер ошибок
 app.use(errors());
 
 // обрабатываем ошибку 404
-app.use('*', () => {
-  throw new NotFoundError('Запрашиваемый ресурс не найден.');
+app.use(() => {
+  throw new NotFoundError('Карточка или пользователь не найден.');
 });
 // обрабатываем ошибку 500
 app.use((err, req, res, next) => {
