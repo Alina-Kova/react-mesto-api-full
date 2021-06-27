@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
@@ -8,7 +9,6 @@ const usersRoutes = require('./routes/users');
 const { login, createUser } = require('./controllers/users');
 const auth = require('./middlewares/auth');
 const NotFoundError = require('./errors/not-found-err');
-require('dotenv').config();
 
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 
@@ -29,7 +29,7 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(cors());
+app.use(cors({ origin: 'https://alina.mesto.nomoredomains.monster/', credentials: true }));
 
 app.use(requestLogger); // подключаем логгер запросов
 app.use(auth);
