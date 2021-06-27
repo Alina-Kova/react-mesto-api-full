@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const cookieParser = require('cookie-parser');
 const { errors, celebrate, Joi } = require('celebrate');
 const bodyParser = require('body-parser');
 const cardsRoutes = require('./routes/cards');
@@ -9,7 +10,6 @@ const usersRoutes = require('./routes/users');
 const { login, createUser } = require('./controllers/users');
 const auth = require('./middlewares/auth');
 const NotFoundError = require('./errors/not-found-err');
-
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 
 // Слушаем 3000 порт
@@ -19,6 +19,8 @@ const { PORT = 3000 } = process.env;
 
 const app = express();
 
+app.use(cors({ origin: 'https://alina.mesto.nomoredomains.monster', credentials: true }));
+app.use(cookieParser());
 // подключаемся к серверу mongo
 mongoose.connect('mongodb://localhost:27017/mestodb', {
   useNewUrlParser: true,
@@ -29,7 +31,6 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(cors());
 app.use(requestLogger); // подключаем логгер запросов
 
 app.use('/cards', auth, cardsRoutes);
