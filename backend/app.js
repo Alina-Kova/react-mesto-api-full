@@ -32,9 +32,9 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors());
 
 app.use(requestLogger); // подключаем логгер запросов
-
-app.use('/cards', auth, cardsRoutes);
-app.use('/users', auth, usersRoutes);
+app.use(auth);
+app.use('/cards', cardsRoutes);
+app.use('/users', usersRoutes);
 
 // app.get('/crash-test', () => {
 //   setTimeout(() => {
