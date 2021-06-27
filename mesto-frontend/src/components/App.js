@@ -54,9 +54,9 @@ function App() {
 
   React.useEffect(() => {
     //проверяем валидность токена пользователя
-    if (localStorage.getItem('token')) {
-      const jwt = localStorage.getItem('token');
-      auth.getPersonalData(jwt)
+    if (localStorage.getItem("token")) {
+      const token = localStorage.getItem("token");
+      auth.getPersonalData(token)
         .then((res) => {
           if (res) {
             // авторизуем пользователя+получаем имейл пользователя
@@ -77,10 +77,10 @@ function App() {
   //функция регистрации пользователя
   function handleRegister(email, password) {
     auth.register(email, password).then((res) => {
-      localStorage.setItem('token', res.token);
+      localStorage.setItem("token", res.token);
       setUserData(res.data);
       setIsInfoTooltipSuccessful(true);
-      history.push("/signin");
+      history.push("/sign-in");
     })
       .catch((err) => {
         console.log(err);
@@ -93,7 +93,7 @@ function App() {
   function handleLogin(email, password) {
     auth.authorize(email, password).then((res) => {
       if (res.token) {
-        localStorage.setItem('token', res.token);
+        localStorage.setItem("token", res.token);
         setUserData({ email: email });
         setLoggedIn(true);
         history.push("/");
@@ -108,10 +108,10 @@ function App() {
 
   //функция выхода пользователя из аккаунта
   function handleLogout() {
-    localStorage.removeItem('token');
+    localStorage.removeItem("token");
     setLoggedIn(false);
     setUserData({ email: "" });
-    history.push("/signin");
+    history.push("/sign-in");
   }
 
   //обработчик формы изменения аватара
@@ -220,16 +220,16 @@ function App() {
               component={Main}
               loggedIn={loggedIn} />
 
-            <Route path="/signin">
+            <Route path="/sign-in">
               <Login onLogin={handleLogin}></Login>
             </Route>
 
-            <Route path="/signup">
+            <Route path="/sign-up">
               <Register onRegister={handleRegister}></Register>
             </Route>
 
             <Route>
-              {loggedIn ? <Redirect to="/" /> : <Redirect to="/signin" />}
+              {loggedIn ? <Redirect to="/" /> : <Redirect to="/sign-in" />}
             </Route>
           </Switch>
 

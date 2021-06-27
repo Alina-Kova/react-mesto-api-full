@@ -32,7 +32,7 @@ export function Register(props) {
                     <button className="register__submit register__submit_type_signup" type="submit">Зарегистрироваться</button>
                 </form>
                 <h3 className="register__subtitle">Уже зарегистрированы?&nbsp;
-                <Link to="/signin" className="register__login-button">Войти</Link>
+                <Link to="/sign-in" className="register__login-button">Войти</Link>
                 </h3>
             </div>
     )
