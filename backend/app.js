@@ -19,7 +19,7 @@ const { PORT = 3000 } = process.env;
 
 const app = express();
 
-app.use(cors({ origin: 'https://alina.mesto.nomoredomains.monster', credentials: true }));
+app.use(cors());
 app.use(cookieParser());
 // подключаемся к серверу mongo
 mongoose.connect('mongodb://localhost:27017/mestodb', {
@@ -44,15 +44,15 @@ app.use('/users', auth, usersRoutes);
 
 app.post('/signin', celebrate({
   body: Joi.object().keys({
-    email: Joi.string().required(),
-    password: Joi.string().required(),
+    email: Joi.string().required().email(),
+    password: Joi.string().required().min(8),
   }),
 }), login);
 
 app.post('/signup', celebrate({
   body: Joi.object().keys({
-    email: Joi.string().required(),
-    password: Joi.string().required(),
+    email: Joi.string().required().email(),
+    password: Joi.string().required().min(8),
     name: Joi.string().min(2).max(30),
     about: Joi.string().min(2).max(30),
     avatar: Joi.string().pattern(/https?:\/\/(w{3})?\.?[0-9A-Za-z\-._~:/?#[\]@!$&'()*+,;=]#?/),
@@ -67,8 +67,8 @@ app.use(errorLogger); // подключаем логгер ошибок
 app.use(errors());
 
 // обрабатываем ошибку 404
-app.all('*', () => {
-  throw new NotFoundError('Карточка или пользователь не найден.');
+app.use('*', () => {
+  throw new NotFoundError('Запрашиваемый ресурс не найден.');
 });
 // обрабатываем ошибку 500
 app.use((err, req, res, next) => {

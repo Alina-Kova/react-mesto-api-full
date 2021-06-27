@@ -54,8 +54,8 @@ function App() {
 
   React.useEffect(() => {
     //проверяем валидность токена пользователя
-    if (localStorage.getItem('jwt')) {
-      const jwt = localStorage.getItem('jwt');
+    if (localStorage.getItem('token')) {
+      const jwt = localStorage.getItem('token');
       auth.getPersonalData(jwt)
         .then((res) => {
           if (res) {
@@ -77,7 +77,7 @@ function App() {
   //функция регистрации пользователя
   function handleRegister(email, password) {
     auth.register(email, password).then((res) => {
-      localStorage.setItem('jwt', res.token);
+      localStorage.setItem('token', res.token);
       setUserData(res.data);
       setIsInfoTooltipSuccessful(true);
       history.push("/signin");
@@ -93,7 +93,7 @@ function App() {
   function handleLogin(email, password) {
     auth.authorize(email, password).then((res) => {
       if (res.token) {
-        localStorage.setItem('jwt', res.token);
+        localStorage.setItem('token', res.token);
         setUserData({ email: email });
         setLoggedIn(true);
         history.push("/");
@@ -108,7 +108,7 @@ function App() {
 
   //функция выхода пользователя из аккаунта
   function handleLogout() {
-    localStorage.removeItem('jwt');
+    localStorage.removeItem('token');
     setLoggedIn(false);
     setUserData({ email: "" });
     history.push("/signin");
