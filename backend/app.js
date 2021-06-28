@@ -44,14 +44,16 @@ app.use('/users', usersRoutes);
 
 app.post('/signin', celebrate({
   body: Joi.object().keys({
-    email: Joi.string().required().email(),
+    // email: Joi.string().required().email(),
+    email: Joi.string().required().pattern('^[a-z0-9-_.]{1,20}@[a-z0-9-_.]{1,20}\\.[a-z]{2,5}$'),
     password: Joi.string().required().min(8),
   }),
 }), login);
 
 app.post('/signup', celebrate({
   body: Joi.object().keys({
-    email: Joi.string().required().email(),
+    // email: Joi.string().required().email(),
+    email: Joi.string().required().pattern('^[a-z0-9-_.]{1,20}@[a-z0-9-_.]{1,20}\\.[a-z]{2,5}$'),
     password: Joi.string().required().min(8),
     name: Joi.string().min(2).max(30),
     about: Joi.string().min(2).max(30),
