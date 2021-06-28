@@ -16,7 +16,7 @@
   "author": "Alina Kotikova",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/Alina-Kova/express-mesto/issues"
+    "url": "https://github.com/Alina-Kova/react-mesto-api-full/mesto-frontend/issues"
   },
   "homepage": "https://github.com/Alina-Kova/express-mesto#readme",
   "devDependencies": {
