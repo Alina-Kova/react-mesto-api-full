@@ -118,7 +118,7 @@ export default class Api {
 export const api = new Api({
     baseUrl: 'https://api.alina.mesto.nomoredomains.monster',
 	headers: {
-        // authorization: `Bearer ${localStorage.getItem('jwt')}`,
+        authorization: `Bearer ${localStorage.getItem('jwt')}`,
 		'Content-Type': 'application/json'
 	}
 })
