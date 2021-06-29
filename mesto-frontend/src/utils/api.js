@@ -18,7 +18,7 @@ export default class Api {
     getPersonalInfo() {
         return fetch(`${this._baseUrl}/users/me`, {
             method: 'GET',
-            credentials: "include",
+            credentials: 'include',
             headers: this._headers
         })
             .then(this._getResponseData);
@@ -28,7 +28,7 @@ export default class Api {
     getInitialCards() {
         return fetch(`${this._baseUrl}/cards`, {
             method: 'GET',
-            credentials: "include",
+            credentials: 'include',
             headers: this._headers
         })
             .then(this._getResponseData);
@@ -38,7 +38,7 @@ export default class Api {
     showUserInfo(data) {
         return fetch(`${this._baseUrl}/users/me`, {
             method: 'PATCH',
-            credentials: "include",
+            credentials: 'include',
             headers: this._headers,
             body: JSON.stringify({
                 name: data.name,
@@ -52,7 +52,7 @@ export default class Api {
     addNewCard(data) {
         return fetch(`${this._baseUrl}/cards`, {
             method: 'POST',
-            credentials: "include",
+            credentials: 'include',
             headers: this._headers,
             body: JSON.stringify({
                 link: data.link,
@@ -67,14 +67,14 @@ export default class Api {
         if (isLiked) {
         return fetch(`${this._baseUrl}/cards/likes/${cardId}`, {
             method: 'PUT',
-            credentials: "include",
+            credentials: 'include',
             headers: this._headers
         })
             .then(this._getResponseData);
     } else {
                 return fetch(`${this._baseUrl}/cards/likes/${cardId}`, {
             method: 'DELETE',
-            credentials: "include",
+            credentials: 'include',
             headers: this._headers
         })
             .then(this._getResponseData);
@@ -85,7 +85,7 @@ export default class Api {
     deleteCard(cardId) {
         return fetch(`${this._baseUrl}/cards/${cardId}`, {
             method: 'DELETE',
-            credentials: "include",
+            credentials: 'include',
             headers: this._headers
         })
             .then(this._getResponseData);
@@ -95,7 +95,7 @@ export default class Api {
     unlikeCard(cardId) {
         return fetch(`${this._baseUrl}/cards/likes/${cardId}`, {
             method: 'DELETE',
-            credentials: "include",
+            credentials: 'include',
             headers: this._headers
         })
             .then(this._getResponseData);
@@ -105,7 +105,7 @@ export default class Api {
     editAvatar(data) {
         return fetch(`${this._baseUrl}/users/me/avatar`, {
             method: 'PATCH',
-            credentials: "include",
+            credentials: 'include',
             headers: this._headers,
             body: JSON.stringify({
                 avatar: data.avatar

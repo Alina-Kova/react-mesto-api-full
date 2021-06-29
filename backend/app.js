@@ -1,6 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const cookieParser = require('cookie-parser');
 const mongoose = require('mongoose');
 const { errors, celebrate, Joi } = require('celebrate');
 const bodyParser = require('body-parser');
@@ -29,7 +30,12 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(cors({ origin: ' http://localhost:3000', credentials: true }));
+app.use(cors({
+  origin: 'https://alina.mesto.nomoredomains.monster',
+  credentials: true,
+  allowedHeaders: 'cookie,content-type',
+}));
+app.use(cookieParser());
 
 app.use(requestLogger); // подключаем логгер запросов
 app.use(auth);
@@ -67,8 +73,12 @@ app.use(errorLogger); // подключаем логгер ошибок
 app.use(errors());
 
 // обрабатываем ошибку 404
-app.use('/*', () => {
-  throw new NotFoundError('Карточка или пользователь не найден.');
+// app.use('*', () => {
+//   throw new NotFoundError('Карточка или пользователь не найден.');
+// });
+
+app.all('*', (req, res, next) => {
+  next(new NotFoundError('Карточка или пользователь не найден.'));
 });
 
 // обрабатываем ошибку 500
