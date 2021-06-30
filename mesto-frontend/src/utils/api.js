@@ -17,7 +17,7 @@ export default class Api {
     //получение информации о пользователе с сервера
     getPersonalInfo() {
         return fetch(`${this._baseUrl}/users/me`, {
-            // method: 'GET',
+            method: 'GET',
             credentials: 'include',
             headers: this._headers
         })
@@ -27,7 +27,7 @@ export default class Api {
     //получение карточек пользователей с сервера
     getInitialCards() {
         return fetch(`${this._baseUrl}/cards`, {
-            // method: 'GET',
+            method: 'GET',
             credentials: 'include',
             headers: this._headers
         })
