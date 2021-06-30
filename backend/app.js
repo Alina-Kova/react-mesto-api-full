@@ -73,9 +73,9 @@ app.use(errorLogger); // подключаем логгер ошибок
 app.use(errors());
 
 // обрабатываем ошибку 404
-// app.use('*', () => {
-//   throw new NotFoundError('Карточка или пользователь не найден.');
-// });
+app.all('*', () => {
+  throw new NotFoundError('Карточка или пользователь не найден.');
+});
 
 app.all('*', (req, res, next) => {
   next(new NotFoundError('Карточка или пользователь не найден.'));
