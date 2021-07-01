@@ -30,10 +30,14 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(cors({
-  origin: 'https://alina.mesto.nomoredomains.monster',
+app.use('*', cors({
+  origin: ['https://alina.mesto.nomoredomains.monster',
+    'https://api.alina.mesto.nomoredomains.monster',
+    'http://localhost:3000'],
   credentials: true,
-  allowedHeaders: 'cookie,content-type',
+  allowedHeaders: 'cookie,content-type,Authorization',
+  preflightContinue: false,
+  method: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE', 'HEAD'],
 }));
 app.use(cookieParser());
 
@@ -73,11 +77,11 @@ app.use(errorLogger); // подключаем логгер ошибок
 app.use(errors());
 
 // обрабатываем ошибку 404
-app.all('*', () => {
+app.use(() => {
   throw new NotFoundError('Карточка или пользователь не найден.');
 });
 
-app.all('*', (req, res, next) => {
+app.use((req, res, next) => {
   next(new NotFoundError('Карточка или пользователь не найден.'));
 });
 
