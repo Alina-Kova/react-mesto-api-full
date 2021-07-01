@@ -30,15 +30,27 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use('*', cors({
-  origin: ['https://alina.mesto.nomoredomains.monster',
+
+const corsOption = {
+  origin: [
+    'https://alina.mesto.nomoredomains.monster',
     'https://api.alina.mesto.nomoredomains.monster',
-    'http://localhost:3000'],
+    'http://localhost:3000',
+  ],
   credentials: true,
-  allowedHeaders: 'cookie,content-type,Authorization',
   preflightContinue: false,
   method: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE', 'HEAD'],
-}));
+  allowedHeaders: ['origin', 'content-type', 'Authorization'],
+};
+
+app.use('*', cors(corsOption));
+
+// app.use(cors({
+//   origin: 'https://alina.mesto.nomoredomains.monster',
+//   credentials: true,
+//   allowedHeaders: 'cookie,content-type',
+// }));
+
 app.use(cookieParser());
 
 app.use(requestLogger); // подключаем логгер запросов
