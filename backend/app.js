@@ -44,15 +44,14 @@ app.use(bodyParser.urlencoded({ extended: true }));
 //  allowedHeaders: ['origin', 'content-type', 'Authorization'],
 // };
 
-app.use('*', cors({
+app.use(cors({
   origin: [
     'https://alina.mesto.nomoredomains.monster',
     'http://alina.mesto.nomoredomains.monster',
-    'https://api.alina.mesto.nomoredomains.monster',
-    'http://api.alina.mesto.nomoredomains.monster',
     'http://localhost:3000',
   ],
   credentials: true,
+  preflightContinue: false,
 }));
 
 // app.use(cors({
