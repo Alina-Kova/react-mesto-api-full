@@ -54,7 +54,7 @@ app.use(cors({
   ],
   credentials: true,
   preflightContinue: false,
-  method: 'GET,POST,PATCH,PUT,DELETE,HEAD',
+  method: 'GET,POST,PATCH,PUT,DELETE,HEAD,OPTIONS',
   allowedHeaders: 'origin,content-type,Authorization',
 }));
 
