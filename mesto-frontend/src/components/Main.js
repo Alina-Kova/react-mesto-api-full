@@ -25,8 +25,8 @@ export function Main(props) {
 
       <section className="elements">
         <ul className="elements__list">
-          {props.cards.map(card => {
-            return (<Card
+          {props.cards.map((card) => (
+              <Card
               card={card}
               onCardClick={props.onCardClick}
               onCardLike={props.onCardLike}
@@ -36,8 +36,7 @@ export function Main(props) {
               name={card.name}
               likes={card.likes.length}
             />
-            )
-          })}
+          ))}
         </ul>
       </section>
     </main>
