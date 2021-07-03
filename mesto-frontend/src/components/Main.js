@@ -27,14 +27,14 @@ export function Main(props) {
         <ul className="elements__list">
           {props.cards.map((card) => (
               <Card
-              card={card}
-              onCardClick={props.onCardClick}
-              onCardLike={props.onCardLike}
-              onCardDelete={props.onCardDelete}
-              key={card._id}
-              link={card.link}
-              name={card.name}
-              likes={card.likes.length}
+                card={card}
+                onCardClick={props.onCardClick}
+                onCardLike={props.onCardLike}
+                onCardDelete={props.onCardDelete}
+                key={card._id}
+                link={card.link}
+                name={card.name}
+                likes={card.likes.length}
             />
           ))}
         </ul>
