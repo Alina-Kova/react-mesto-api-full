@@ -23,8 +23,6 @@ app.use(cors({
   origin: [
     'https://alina.mesto.nomoredomains.monster',
     'http://alina.mesto.nomoredomains.monster',
-    'https://api.alina.mesto.nomoredomains.monster',
-    'http://api.alina.mesto.nomoredomains.monster',
     'http://localhost:3000',
   ],
   credentials: true,
@@ -78,7 +76,7 @@ app.use(errorLogger); // подключаем логгер ошибок
 app.use(errors());
 
 // обрабатываем ошибку 404
-app.use(() => {
+app.use('/', () => {
   throw new NotFoundError('Карточка или пользователь не найден.');
 });
 
