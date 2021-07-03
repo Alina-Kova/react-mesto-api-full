@@ -48,10 +48,14 @@ app.use(cors({
   origin: [
     'https://alina.mesto.nomoredomains.monster',
     'http://alina.mesto.nomoredomains.monster',
+    'https://api.alina.mesto.nomoredomains.monster',
+    'http://api.alina.mesto.nomoredomains.monster',
     'http://localhost:3000',
   ],
   credentials: true,
   preflightContinue: false,
+  method: 'GET,POST,PATCH,PUT,DELETE,HEAD',
+  allowedHeaders: 'origin,content-type,Authorization',
 }));
 
 // app.use(cors({
