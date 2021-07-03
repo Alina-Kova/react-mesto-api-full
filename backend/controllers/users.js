@@ -60,10 +60,17 @@ module.exports.createUser = (req, res, next) => {
       email,
       password: hash,
     }))
+    // .then((user) => {
+    // eslint-disable-next-line no-shadow
+    // const {
+    //   _id, email,
+    // } = user;
+    //   res.status(200).send({ _id, email });
+    // })
     .then((user) => {
-      // eslint-disable-next-line no-shadow
-      const { _id, email } = user;
-      res.status(200).send({ _id, email });
+      res.status(200).send({
+        name: user.name, about: user.about, avatar: user.avatar, _id: user._id, email: user.email,
+      });
     })
     .catch((err) => {
       if (err.name === 'MongoError' && err.code === 11000) {
