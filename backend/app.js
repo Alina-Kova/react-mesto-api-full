@@ -1,17 +1,16 @@
 require('dotenv').config();
 const express = require('express');
-const cors = require('cors');
-const cookieParser = require('cookie-parser');
 const mongoose = require('mongoose');
 const { errors, celebrate, Joi } = require('celebrate');
+const cors = require('cors');
 const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
 const cardsRoutes = require('./routes/cards');
 const usersRoutes = require('./routes/users');
 const { login, createUser } = require('./controllers/users');
+const { requestLogger, errorLogger } = require('./middlewares/logger');
 const auth = require('./middlewares/auth');
 const NotFoundError = require('./errors/not-found-err');
-
-const { requestLogger, errorLogger } = require('./middlewares/logger');
 
 // Слушаем 3000 порт
 const { PORT = 3000 } = process.env;
@@ -19,6 +18,17 @@ const { PORT = 3000 } = process.env;
 // http://localhost:3000/users
 
 const app = express();
+
+app.use(cors({
+  origin: [
+    'https://alina.mesto.nomoredomains.monster',
+    'http://alina.mesto.nomoredomains.monster',
+    'https://api.alina.mesto.nomoredomains.monster',
+    'http://api.alina.mesto.nomoredomains.monster',
+    'http://localhost:3000',
+  ],
+  credentials: true,
+}));
 
 // подключаемся к серверу mongo
 mongoose.connect('mongodb://localhost:27017/mestodb', {
@@ -30,47 +40,12 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-
-// const corsOption = {
-//   origin: [
-//     'https://alina.mesto.nomoredomains.monster',
-//     'http://alina.mesto.nomoredomains.monster',
-//     'https://api.alina.mesto.nomoredomains.monster',
-//     'http://api.alina.mesto.nomoredomains.monster',
-//     'http://localhost:3000',
-//   ],
-//   credentials: true,
-//  method: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE', 'HEAD'],
-//  allowedHeaders: ['origin', 'content-type', 'Authorization'],
-// };
-
-app.use(cors({
-  origin: [
-    'https://alina.mesto.nomoredomains.monster',
-    'http://alina.mesto.nomoredomains.monster',
-    'https://api.alina.mesto.nomoredomains.monster',
-    'http://api.alina.mesto.nomoredomains.monster',
-    'http://localhost:3000',
-  ],
-  credentials: true,
-  preflightContinue: false,
-  method: 'GET,POST,PATCH,PUT,DELETE,HEAD,OPTIONS',
-  allowedHeaders: 'origin,content-type,Authorization',
-}));
-
-// app.use(cors({
-//   origin: [
-//     'https://alina.mesto.nomoredomains.monster'],
-//   credentials: true,
-//   allowedHeaders: 'cookie,content-type',
-// }));
-
 app.use(cookieParser());
 
 app.use(requestLogger); // подключаем логгер запросов
-app.use(auth);
-app.use('/cards', cardsRoutes);
-app.use('/users', usersRoutes);
+
+app.use('/cards', auth, cardsRoutes);
+app.use('/users', auth, usersRoutes);
 
 // app.get('/crash-test', () => {
 //   setTimeout(() => {

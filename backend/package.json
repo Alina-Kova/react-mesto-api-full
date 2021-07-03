@@ -16,9 +16,9 @@
   "author": "Alina Kotikova",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/Alina-Kova/react-mesto-api-full/mesto-frontend/issues"
+    "url": "https://github.com/Alina-Kova/react-mesto-api-full/backend/issues"
   },
-  "homepage": "https://github.com/Alina-Kova/express-mesto#readme",
+  "homepage": "https://github.com/Alina-Kova/react-mesto-api-full/backend#readme",
   "devDependencies": {
     "eslint": "^7.27.0",
     "eslint-config-airbnb-base": "^14.2.1",
