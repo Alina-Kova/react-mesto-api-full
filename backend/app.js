@@ -31,22 +31,33 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-const corsOption = {
+// const corsOption = {
+//   origin: [
+//     'https://alina.mesto.nomoredomains.monster',
+//     'http://alina.mesto.nomoredomains.monster',
+//     'https://api.alina.mesto.nomoredomains.monster',
+//     'http://api.alina.mesto.nomoredomains.monster',
+//     'http://localhost:3000',
+//   ],
+//   credentials: true,
+//  method: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE', 'HEAD'],
+//  allowedHeaders: ['origin', 'content-type', 'Authorization'],
+// };
+
+app.use('*', cors({
   origin: [
     'https://alina.mesto.nomoredomains.monster',
+    'http://alina.mesto.nomoredomains.monster',
     'https://api.alina.mesto.nomoredomains.monster',
+    'http://api.alina.mesto.nomoredomains.monster',
     'http://localhost:3000',
   ],
   credentials: true,
-  preflightContinue: false,
-  method: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE', 'HEAD'],
-  allowedHeaders: ['origin', 'content-type', 'Authorization'],
-};
-
-app.use('*', cors(corsOption));
+}));
 
 // app.use(cors({
-//   origin: 'https://alina.mesto.nomoredomains.monster',
+//   origin: [
+//     'https://alina.mesto.nomoredomains.monster'],
 //   credentials: true,
 //   allowedHeaders: 'cookie,content-type',
 // }));
@@ -91,10 +102,6 @@ app.use(errors());
 // обрабатываем ошибку 404
 app.use(() => {
   throw new NotFoundError('Карточка или пользователь не найден.');
-});
-
-app.use((req, res, next) => {
-  next(new NotFoundError('Карточка или пользователь не найден.'));
 });
 
 // обрабатываем ошибку 500
