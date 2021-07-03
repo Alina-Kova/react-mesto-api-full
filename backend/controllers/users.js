@@ -60,13 +60,6 @@ module.exports.createUser = (req, res, next) => {
       email,
       password: hash,
     }))
-    // .then((user) => {
-    // eslint-disable-next-line no-shadow
-    // const {
-    //   _id, email,
-    // } = user;
-    //   res.status(200).send({ _id, email });
-    // })
     .then((user) => {
       res.status(200).send({
         name: user.name, about: user.about, avatar: user.avatar, _id: user._id, email: user.email,
@@ -142,7 +135,13 @@ module.exports.login = (req, res, next) => {
         { expiresIn: '7d' },
       );
       // вернём токен
-      res.send({ token });
+      res
+        .cookie('jwt', token, {
+          maxAge: 3600000 * 24 * 7,
+          httpOnly: true,
+          sameSite: true,
+        })
+        .send({ _id: user._id });
     })
     .catch(() => {
       // ошибка аутентификации

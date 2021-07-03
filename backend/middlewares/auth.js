@@ -5,15 +5,21 @@ const { NODE_ENV, JWT_SECRET } = process.env;
 
 module.exports = (req, res, next) => {
   // достаём авторизационный заголовок
-  const { authorization } = req.headers;
+  // const { authorization } = req.headers;
+  const token = req.cookies.jwt;
 
-  // убеждаемся, что он есть или начинается с Bearer
-  if (!authorization || !authorization.startsWith('Bearer ')) {
+  // // убеждаемся, что он есть или начинается с Bearer
+  // if (!authorization || !authorization.startsWith('Bearer ')) {
+  //   throw new AuthorizationError('Необходима авторизация');
+  // }
+
+  // // извлечём токен
+  // const token = authorization.replace('Bearer ', '');
+
+  if (!token) {
     throw new AuthorizationError('Необходима авторизация');
   }
 
-  // извлечём токен
-  const token = authorization.replace('Bearer ', '');
   let payload;
 
   try {
