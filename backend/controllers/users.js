@@ -10,7 +10,8 @@ const ExistingDataError = require('../errors/existing-data-err');
 
 module.exports.getUser = (req, res, next) => {
   User.find({})
-    .then((user) => res.send({ data: user }))
+    // .then((user) => res.send({ data: user }))
+    .then((user) => res.send(user))
     .catch(next);
 };
 
@@ -20,7 +21,8 @@ module.exports.getMe = (req, res, next) => {
       if (!user) {
         throw new NotFoundError('Пользователь не найден.');
       }
-      return res.send({ data: user });
+      // return res.send({ data: user });
+      return res.send(user);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
@@ -37,7 +39,8 @@ module.exports.getUserById = (req, res, next) => {
       if (!user) {
         throw new NotFoundError('Пользователь не найден.');
       }
-      return res.send({ data: user });
+      // return res.send({ data: user });
+      return res.send(user);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
@@ -89,7 +92,8 @@ module.exports.updateProfile = (req, res, next) => {
       if (!user) {
         throw new NotFoundError('Пользователь с указанным _id не найден.');
       }
-      return res.send({ data: user });
+      // return res.send({ data: user });
+      return res.send(user);
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -111,7 +115,8 @@ module.exports.updateAvatar = (req, res, next) => {
       if (!user) {
         throw new NotFoundError('Пользователь с указанным _id не найден.');
       }
-      return res.send({ data: user });
+      // return res.send({ data: user });
+      return res.send(user);
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {

@@ -32,15 +32,28 @@ function App() {
   //переменные состояния с пустым массивом карточек, подтягивает данные о карточках через API
   const [cards, setCards] = React.useState([]);
   //переменные состояния, определяющие имейл зарегистрированного пользователя
-  const [userData, setUserData] = React.useState({
-    email: "",
-  });
+  // const [userData, setUserData] = React.useState({
+  //   email: "",
+  // });
+  const [userData, setUserData] = React.useState({});
   //переменные состояния, определяющие залогинился ли пользователь
   const [loggedIn, setLoggedIn] = React.useState(false);
 
   const history = useHistory();
 
   //передаем массив с данными пользователя и имеющимися карточками методу Promise.all
+  // React.useEffect(() => {
+  //   Promise.all([api.getPersonalInfo(), api.getInitialCards()])
+  //     .then(([data, card]) => {
+  //       setCurrentUser(data);
+  //       setCards(card);
+  //     })
+  //     .catch((err) => {
+  //       console.log(err);
+  //     });
+  // // }, []);
+  // }, [loggedIn]);
+
   React.useEffect(() => {
     Promise.all([api.getPersonalInfo(), api.getInitialCards()])
       .then(([data, card]) => {
@@ -50,12 +63,16 @@ function App() {
       .catch((err) => {
         console.log(err);
       });
-  }, []);
+  // }, []);
+  }, [loggedIn]);
+
 
   React.useEffect(() => {
     //проверяем валидность токена пользователя
-    if (localStorage.getItem("token")) {
-      const token = localStorage.getItem("token");
+    // if (localStorage.getItem("token")) {
+    //   const token = localStorage.getItem("token");
+    const token = localStorage.getItem("token");
+    if (token) {
       auth.getPersonalData(token)
         .then((res) => {
           if (res) {
@@ -75,12 +92,28 @@ function App() {
   }, [history]);
 
   //функция регистрации пользователя
-  function handleRegister(email, password) {
+  // function handleRegister(email, password) {
+  //   auth.register(email, password).then((res) => {
+  //     localStorage.setItem("token", res.token);
+  //     setUserData(res.data);
+  //     setIsInfoTooltipSuccessful(true);
+  //     history.push("/sign-in");
+  //   })
+  //     .catch((err) => {
+  //       console.log(err);
+  //       setIsInfoTooltipSuccessful(false);
+  //     })
+  //     .finally(() => setIsInfoTooltipOpen(true));
+  // }
+
+    function handleRegister(email, password) {
     auth.register(email, password).then((res) => {
-      localStorage.setItem("token", res.token);
+      if(res.token) {
+      // localStorage.setItem("token", res.token);
       setUserData(res.data);
       setIsInfoTooltipSuccessful(true);
       history.push("/sign-in");
+      }
     })
       .catch((err) => {
         console.log(err);
@@ -90,13 +123,31 @@ function App() {
   }
 
   //функция авторизации пользователя
+  // function handleLogin(email, password) {
+  //   auth.authorize(email, password).then((res) => {
+  //     if (res.token) {
+  //       localStorage.setItem("token", res.token);
+  //       setUserData({ email: email });
+  //       setLoggedIn(true);
+  //       history.push("/");
+  //     }
+  //   })
+  //     .catch((err) => {
+  //       console.log(err);
+  //       setIsInfoTooltipSuccessful(false);
+  //       setIsInfoTooltipOpen(true);
+  //     });
+  // }
+
   function handleLogin(email, password) {
     auth.authorize(email, password).then((res) => {
       if (res.token) {
-        localStorage.setItem("token", res.token);
         setUserData({ email: email });
+        localStorage.setItem("token", res.token);
         setLoggedIn(true);
         history.push("/");
+        api.getPersonalInfo();
+        api.getInitialCards();
       }
     })
       .catch((err) => {
