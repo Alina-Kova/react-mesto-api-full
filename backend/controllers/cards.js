@@ -4,7 +4,6 @@ const IncorrectDataError = require('../errors/incorrect-data-err');
 
 module.exports.getCard = (req, res, next) => {
   Card.find({})
-    // .then((card) => res.send({ data: card }))
     .then((card) => res.send(card))
     .catch(next);
 };
@@ -12,7 +11,6 @@ module.exports.getCard = (req, res, next) => {
 module.exports.createCard = (req, res, next) => {
   const { name, link } = req.body;
   Card.create({ name, link, owner: req.user._id })
-    // .then((card) => res.send({ data: card }))
     .then((card) => res.send(card))
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -35,8 +33,6 @@ module.exports.deleteCard = (req, res, next) => {
         throw new IncorrectDataError('Не возможно удалить карточку, она создана другим пользователем.');
       }
       Card.findByIdAndDelete(req.params.id)
-        // .then((cardRemoval) => {
-        //   res.send({ data: cardRemoval });
         .then((cardRemoval) => {
           res.send(cardRemoval);
         });
@@ -60,7 +56,6 @@ module.exports.likeCard = (req, res, next) => {
       if (!card) {
         throw new NotFoundError('Карточка с указанным _id не найдена.');
       }
-      // return res.send({ data: card });
       return res.send(card);
     })
     .catch((err) => {
@@ -82,7 +77,6 @@ module.exports.dislikeCard = (req, res, next) => {
       if (!card) {
         throw new NotFoundError('Карточка с указанным _id не найдена.');
       }
-      // return res.send({ data: card });
       return res.send(card);
     })
     .catch((err) => {
