@@ -32,62 +32,25 @@ function App() {
   //переменные состояния с пустым массивом карточек, подтягивает данные о карточках через API
   const [cards, setCards] = React.useState([]);
   //переменные состояния, определяющие имейл зарегистрированного пользователя
-  // const [userData, setUserData] = React.useState({
-  //   email: "",
-  // });
-  const [userData, setUserData] = React.useState({});
+  const [userData, setUserData] = React.useState({
+    email: "",
+  });
   //переменные состояния, определяющие залогинился ли пользователь
   const [loggedIn, setLoggedIn] = React.useState(false);
 
   const history = useHistory();
 
   //передаем массив с данными пользователя и имеющимися карточками методу Promise.all
-  // React.useEffect(() => {
-  //   Promise.all([api.getPersonalInfo(), api.getInitialCards()])
-  //     .then(([data, card]) => {
-  //       setCurrentUser(data);
-  //       setCards(card);
-  //     })
-  //     .catch((err) => {
-  //       console.log(err);
-  //     });
-  // }, [loggedIn]);
-
-  // React.useEffect(() => {
-  //   Promise.all([api.getPersonalInfo(), api.getInitialCards()])
-  //     .then(([data, card]) => {
-  //       setCurrentUser(data);
-  //       setCards(card);
-  //     })
-  //     .catch((err) => {
-  //       console.log(err);
-  //     });
-  // }, []);
-
   React.useEffect(() => {
-    if (loggedIn) {
-      api.getPersonalInfo()
-         .then((data) => {
-          setCurrentUser(data);
-        })
+    Promise.all([api.getPersonalInfo(), api.getInitialCards()])
+      .then(([data, card]) => {
+        setCurrentUser(data);
+        setCards(card);
+      })
       .catch((err) => {
         console.log(err);
       });
-    }
-  }, [loggedIn]);
-
-  React.useEffect(() => {
-    if (loggedIn) {
-      api.getInitialCards()
-         .then((card) => {
-          setCards(card);
-        })
-      .catch((err) => {
-        console.log(err);
-      });
-    }
-  }, [loggedIn]);
-
+  }, []);
 
   React.useEffect(() => {
     //проверяем валидность токена пользователя
@@ -97,11 +60,8 @@ function App() {
         .then((res) => {
           if (res) {
             // авторизуем пользователя+получаем имейл пользователя
-            // setUserData({ email: res.data.email });
-            // setLoggedIn(true);
-            // history.push("/");
-            setLoggedIn(true);
             setUserData({ email: res.data.email });
+            setLoggedIn(true);
             history.push("/");
           }
         })
@@ -115,29 +75,12 @@ function App() {
   }, [history]);
 
   //функция регистрации пользователя
-  // function handleRegister(email, password) {
-  //   auth.register(email, password).then((res) => {
-  //     localStorage.setItem("token", res.token);
-  //     setUserData(res.data);
-  //     setIsInfoTooltipSuccessful(true);
-  //     history.push("/sign-in");
-  //   })
-  //     .catch((err) => {
-  //       console.log(err);
-  //       setIsInfoTooltipSuccessful(false);
-  //     })
-  //     .finally(() => setIsInfoTooltipOpen(true));
-  // }
-
   function handleRegister(email, password) {
-    auth.register(email, password)
-        .then((res) => {
-          if (res) {
-            setIsInfoTooltipSuccessful(true);
-            // localStorage.setItem("token", res.token);
-            history.push("/sign-in");
-            setUserData(res.data);
-    }
+    auth.register(email, password).then((res) => {
+      localStorage.setItem("token", res.token);
+      setUserData(res.data);
+      setIsInfoTooltipSuccessful(true);
+      history.push("/sign-in");
     })
       .catch((err) => {
         console.log(err);
@@ -147,28 +90,12 @@ function App() {
   }
 
   //функция авторизации пользователя
-  // function handleLogin(email, password) {
-  //   auth.authorize(email, password).then((res) => {
-  //     if (res.token) {
-  //       localStorage.setItem("token", res.token);
-  //       setUserData({ email: email });
-  //       setLoggedIn(true);
-  //       history.push("/");
-  //     }
-  //   })
-  //     .catch((err) => {
-  //       console.log(err);
-  //       setIsInfoTooltipSuccessful(false);
-  //       setIsInfoTooltipOpen(true);
-  //     });
-  // }
-
   function handleLogin(email, password) {
     auth.authorize(email, password).then((res) => {
       if (res.token) {
         localStorage.setItem("token", res.token);
+        setUserData({ email: email });
         setLoggedIn(true);
-        setUserData(email);
         history.push("/");
       }
     })
@@ -178,7 +105,6 @@ function App() {
         setIsInfoTooltipOpen(true);
       });
   }
-
 
   //функция выхода пользователя из аккаунта
   function handleLogout() {
