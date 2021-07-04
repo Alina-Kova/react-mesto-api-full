@@ -69,10 +69,10 @@ function App() {
 
   React.useEffect(() => {
     //проверяем валидность токена пользователя
-    // if (localStorage.getItem("token")) {
-    //   const token = localStorage.getItem("token");
-    const token = localStorage.getItem("token");
-    if (token) {
+    if (localStorage.getItem("token")) {
+      const token = localStorage.getItem("token");
+    // const token = localStorage.getItem("token");
+    // if (token) {
       auth.getPersonalData(token)
         .then((res) => {
           if (res) {
