@@ -142,8 +142,8 @@ function App() {
   function handleLogin(email, password) {
     auth.authorize(email, password).then((res) => {
       if (res.token) {
-        setUserData({ email: email });
         localStorage.setItem("token", res.token);
+        setUserData({ email: email });
         setLoggedIn(true);
         history.push("/");
         api.getPersonalInfo();
