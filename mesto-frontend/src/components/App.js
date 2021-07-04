@@ -51,19 +51,41 @@ function App() {
   //     .catch((err) => {
   //       console.log(err);
   //     });
-  // // }, []);
   // }, [loggedIn]);
 
+  // React.useEffect(() => {
+  //   Promise.all([api.getPersonalInfo(), api.getInitialCards()])
+  //     .then(([data, card]) => {
+  //       setCurrentUser(data);
+  //       setCards(card);
+  //     })
+  //     .catch((err) => {
+  //       console.log(err);
+  //     });
+  // }, []);
+
   React.useEffect(() => {
-    Promise.all([api.getPersonalInfo(), api.getInitialCards()])
-      .then(([data, card]) => {
-        setCurrentUser(data);
-        setCards(card);
-      })
+    if (loggedIn) {
+      api.getPersonalInfo()
+         .then((data) => {
+          setCurrentUser(data);
+        })
       .catch((err) => {
         console.log(err);
       });
-  // }, []);
+    }
+  }, [loggedIn]);
+
+  React.useEffect(() => {
+    if (loggedIn) {
+      api.getInitialCards()
+         .then((card) => {
+          setCards(card);
+        })
+      .catch((err) => {
+        console.log(err);
+      });
+    }
   }, [loggedIn]);
 
 
@@ -71,14 +93,15 @@ function App() {
     //проверяем валидность токена пользователя
     if (localStorage.getItem("token")) {
       const token = localStorage.getItem("token");
-    // const token = localStorage.getItem("token");
-    // if (token) {
       auth.getPersonalData(token)
         .then((res) => {
           if (res) {
             // авторизуем пользователя+получаем имейл пользователя
-            setUserData({ email: res.data.email });
+            // setUserData({ email: res.data.email });
+            // setLoggedIn(true);
+            // history.push("/");
             setLoggedIn(true);
+            setUserData({ email: res.data.email });
             history.push("/");
           }
         })
@@ -106,14 +129,15 @@ function App() {
   //     .finally(() => setIsInfoTooltipOpen(true));
   // }
 
-    function handleRegister(email, password) {
-    auth.register(email, password).then((res) => {
-      if(res.token) {
-      // localStorage.setItem("token", res.token);
-      setUserData(res.data);
-      setIsInfoTooltipSuccessful(true);
-      history.push("/sign-in");
-      }
+  function handleRegister(email, password) {
+    auth.register(email, password)
+        .then((res) => {
+          if (res) {
+            setIsInfoTooltipSuccessful(true);
+            // localStorage.setItem("token", res.token);
+            history.push("/sign-in");
+            setUserData(res.data);
+    }
     })
       .catch((err) => {
         console.log(err);
@@ -143,11 +167,9 @@ function App() {
     auth.authorize(email, password).then((res) => {
       if (res.token) {
         localStorage.setItem("token", res.token);
-        setUserData({ email: email });
         setLoggedIn(true);
+        setUserData(email);
         history.push("/");
-        api.getPersonalInfo();
-        api.getInitialCards();
       }
     })
       .catch((err) => {
@@ -156,6 +178,7 @@ function App() {
         setIsInfoTooltipOpen(true);
       });
   }
+
 
   //функция выхода пользователя из аккаунта
   function handleLogout() {

@@ -1,5 +1,6 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+require('dotenv').config();
 
 const { NODE_ENV, JWT_SECRET } = process.env;
 const User = require('../models/users');
@@ -10,7 +11,6 @@ const ExistingDataError = require('../errors/existing-data-err');
 
 module.exports.getUser = (req, res, next) => {
   User.find({})
-    // .then((user) => res.send({ data: user }))
     .then((user) => res.send(user))
     .catch(next);
 };
@@ -21,7 +21,6 @@ module.exports.getMe = (req, res, next) => {
       if (!user) {
         throw new NotFoundError('Пользователь не найден.');
       }
-      // return res.send({ data: user });
       return res.send(user);
     })
     .catch((err) => {
@@ -39,7 +38,6 @@ module.exports.getUserById = (req, res, next) => {
       if (!user) {
         throw new NotFoundError('Пользователь не найден.');
       }
-      // return res.send({ data: user });
       return res.send(user);
     })
     .catch((err) => {
@@ -65,7 +63,11 @@ module.exports.createUser = (req, res, next) => {
     }))
     .then((user) => {
       res.status(200).send({
-        name: user.name, about: user.about, avatar: user.avatar, _id: user._id, email: user.email,
+        name: user.name,
+        about: user.about,
+        avatar: user.avatar,
+        _id: user._id,
+        email: user.email,
       });
     })
     .catch((err) => {
@@ -92,7 +94,6 @@ module.exports.updateProfile = (req, res, next) => {
       if (!user) {
         throw new NotFoundError('Пользователь с указанным _id не найден.');
       }
-      // return res.send({ data: user });
       return res.send(user);
     })
     .catch((err) => {
@@ -115,7 +116,6 @@ module.exports.updateAvatar = (req, res, next) => {
       if (!user) {
         throw new NotFoundError('Пользователь с указанным _id не найден.');
       }
-      // return res.send({ data: user });
       return res.send(user);
     })
     .catch((err) => {
@@ -129,6 +129,10 @@ module.exports.updateAvatar = (req, res, next) => {
 
 module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
+
+  if (!email || !password) {
+    throw new NotFoundError('Неверно указаны почта или пароль.');
+  }
 
   return User.findUserByCredentials(email, password)
     .then((user) => {
