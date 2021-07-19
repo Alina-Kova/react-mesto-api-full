@@ -135,10 +135,11 @@ app.use(cors({
     'https://api.alina.mesto.nomoredomains.monster',
     'http://api.alina.mesto.nomoredomains.monster',
     'http://localhost:3000',
+    'http://localhost:3001',
   ],
+  // origin: '*',
   credentials: true,
   headers: '*',
-  // origin: '*',
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
 }));
 
