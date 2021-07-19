@@ -61,10 +61,11 @@ export const BASE_URL = "https://api.alina.mesto.nomoredomains.monster";
 export const register = (email, password) => {
 
 	return fetch(`${BASE_URL}/signup`, {
-        mode: 'no-cors',
 		method: "POST",
+		credentials: 'include',
 		headers: {
-			"Content-Type": "application/json",
+			"Content-Type": "application/json; charset=UTF-8",
+			Accept: "application/json",
 		},
 		body: JSON.stringify({ password: password, email: email }),
 	})
@@ -80,10 +81,11 @@ export const register = (email, password) => {
 export const authorize = (email, password) => {
 
 	return fetch(`${BASE_URL}/signin`, {
-        mode: 'no-cors',
 		method: "POST",
+		credentials: 'include',
 		headers: {
-			"Content-Type": "application/json",
+			"Content-Type": "application/json; charset=UTF-8",
+			Accept: "application/json",
 		},
 		body: JSON.stringify({ password: password, email: email }),
 	})
@@ -106,11 +108,12 @@ export const authorize = (email, password) => {
 
 export const getPersonalData = (token) => {
 	return fetch(`${BASE_URL}/users/me`, {
-        mode: 'no-cors',
 		method: "GET",
+		credentials: 'include',
 		headers: {
-			"Content-Type": "application/json",
-			Authorization: `Bearer ${token}`,
+			"Content-Type": "application/json; charset=UTF-8",
+			// Authorization: `Bearer ${token}`,
+			Accept: "application/json",
 		},
 	})
 		.then((res) => {

@@ -14,7 +14,8 @@ import ProtectedRoute from './ProtectedRoute.js';
 import { InfoTooltip } from './InfoTooltip.js';
 import { Login } from './Login.js';
 import { Register } from './Register.js';
-import * as auth from '../utils/auth.js'
+import * as auth from '../utils/auth.js';
+
 
 function App() {
   //переменные состояния, отвечающие за видимость попапов изменения данных пользователя, доб-я карточки и изменения аватара
@@ -37,42 +38,93 @@ function App() {
   });
   //переменные состояния, определяющие залогинился ли пользователь
   const [loggedIn, setLoggedIn] = React.useState(false);
+  const [token, setToken] = React.useState('');
+
 
   const history = useHistory();
 
   //передаем массив с данными пользователя и имеющимися карточками методу Promise.all
-  React.useEffect(() => {
-    Promise.all([api.getPersonalInfo(), api.getInitialCards()])
-      .then(([data, card]) => {
-        setCurrentUser(data);
-        setCards(card);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }, []);
+  // React.useEffect(() => {
+  //   const jwt = localStorage.getItem('jwt');
+  //   Promise.all([api.getPersonalInfo(jwt), api.getInitialCards(jwt)])
+  //     .then(([data, card]) => {
+  //       setCurrentUser(data);
+  //       setCards(card);
+  //     })
+  //     .catch((err) => {
+  //       console.log(err);
+  //     });
+  // }, []);
 
-  React.useEffect(() => {
-    //проверяем валидность токена пользователя
-    if (localStorage.getItem("token")) {
-      const token = localStorage.getItem("token");
-      auth.getPersonalData(token)
+  // React.useEffect(() => {
+  //   //проверяем валидность токена пользователя
+  //   if (localStorage.getItem("token")) {
+  //     const token = localStorage.getItem("token");
+  //     auth.getPersonalData(token)
+  //       .then((res) => {
+  //         if (res) {
+  //           // авторизуем пользователя+получаем имейл пользователя
+  //           setUserData({ email: res.data.email });
+  //           setLoggedIn(true);
+  //           history.push("/");
+  //         }
+  //       })
+  //       //ловим ошибку и сообщаем пользователю в модальном окне
+  //       .catch((err) => {
+  //         console.log(err);
+  //         setIsInfoTooltipSuccessful(false);
+  //         setIsInfoTooltipOpen(true);
+  //       });
+  //   }
+  // }, [history]);
+
+   // авторизация по токену
+   React.useEffect(() => {
+    const jwt = localStorage.getItem('jwt');
+    if (jwt) {
+      auth.getPersonalData(jwt)
         .then((res) => {
           if (res) {
-            // авторизуем пользователя+получаем имейл пользователя
-            setUserData({ email: res.data.email });
+            setToken(jwt);
             setLoggedIn(true);
             history.push("/");
+            setUserData({ email: res.data.email });
           }
         })
-        //ловим ошибку и сообщаем пользователю в модальном окне
-        .catch((err) => {
-          console.log(err);
-          setIsInfoTooltipSuccessful(false);
-          setIsInfoTooltipOpen(true);
-        });
+        .catch((res) => {
+          console.log(`Ошибка: ${res.status}`);
+        })
     }
-  }, [history]);
+  }, [history])
+  
+  // инфо пользователя
+  React.useEffect(() => {
+    const jwt = localStorage.getItem('jwt');
+    if(loggedIn) {
+      api.getPersonalInfo(jwt)
+        .then((data) => {
+          setCurrentUser(data);
+        })
+        .catch((res) => {
+          console.log(`Ошибка: ${res.status}`);
+        })
+    }
+  }, [loggedIn])
+      
+    
+  // начальные карточки
+  React.useEffect(() => {
+    const jwt = localStorage.getItem('jwt');
+    if(loggedIn) {
+      api.getInitialCards(jwt)
+        .then((card) => {
+          setCards(card)
+        })
+        .catch((res) => {
+          console.log(`Ошибка: ${res.status}`);
+        })
+    }
+  }, [loggedIn])
 
   //функция регистрации пользователя
   function handleRegister(email, password) {
@@ -80,7 +132,7 @@ function App() {
       localStorage.setItem("token", res.token);
       setUserData(res.data);
       setIsInfoTooltipSuccessful(true);
-      history.push("/sign-in");
+      history.push("/signin");
     })
       .catch((err) => {
         console.log(err);
@@ -111,7 +163,7 @@ function App() {
     localStorage.removeItem("token");
     setLoggedIn(false);
     setUserData({ email: "" });
-    history.push("/sign-in");
+    history.push("/in");
   }
 
   //обработчик формы изменения аватара
@@ -220,16 +272,16 @@ function App() {
               component={Main}
               loggedIn={loggedIn} />
 
-            <Route path="/sign-in">
+            <Route path="/signin">
               <Login onLogin={handleLogin}></Login>
             </Route>
 
-            <Route path="/sign-up">
+            <Route path="/signup">
               <Register onRegister={handleRegister}></Register>
             </Route>
 
             <Route>
-              {loggedIn ? <Redirect to="/" /> : <Redirect to="/sign-in" />}
+              {loggedIn ? <Redirect to="/" /> : <Redirect to="/signin" />}
             </Route>
           </Switch>
 
