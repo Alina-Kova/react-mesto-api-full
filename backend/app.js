@@ -137,7 +137,7 @@ app.use(cors({
     'http://localhost:3000',
   ],
   credentials: true,
-  allowedHeaders: '*',
+  headers: '*',
   // origin: '*',
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
 }));
