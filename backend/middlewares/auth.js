@@ -17,13 +17,16 @@ module.exports = (req, res, next) => {
   // // извлечём токен
   // const token = authorization.replace('Bearer ', '');
 
-  if (!token) {
-    throw new AuthorizationError('Необходима авторизация');
-  }
+  // if (!token) {
+  //   throw new AuthorizationError('Необходима авторизация');
+  // }
 
   let payload;
 
   try {
+    if (!token) {
+      throw new AuthorizationError('Необходима авторизация');
+    }
     // попытаемся верифицировать токен
     payload = jwt.verify(token, NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret');
   } catch (err) {
@@ -34,4 +37,5 @@ module.exports = (req, res, next) => {
   req.user = payload; // записываем пейлоуд в объект запроса
 
   next(); // пропускаем запрос дальше
+  return true;
 };

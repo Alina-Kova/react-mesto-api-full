@@ -130,10 +130,6 @@ module.exports.updateAvatar = (req, res, next) => {
 module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
 
-  if (!email || !password) {
-    throw new NotFoundError('Неверно указаны почта или пароль.');
-  }
-
   return User.findUserByCredentials(email, password)
     .then((user) => {
       // аутентификация успешна! пользователь в переменной user
@@ -143,14 +139,12 @@ module.exports.login = (req, res, next) => {
         NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret',
         { expiresIn: '7d' },
       );
-      // вернём токен
-      res
-        .cookie('jwt', token, {
+        res.cookie('jwt', token, {
           maxAge: 3600000 * 24 * 7,
           httpOnly: true,
           sameSite: true,
         })
-        .send({ _id: user._id });
+        res.send({ email, _id: user._id });
     })
     .catch(() => {
       // ошибка аутентификации
