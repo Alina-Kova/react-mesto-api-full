@@ -65,14 +65,14 @@ export default class Api {
     //добавление лайка/отображение кол-ва лайков у карточки
     showLikesNumber(cardId, isLiked) {
         if (isLiked) {
-        return fetch(`${this._baseUrl}/cards/likes/${cardId}`, {
+        return fetch(`${this._baseUrl}/cards/${cardId}/likes`, {
             method: 'PUT',
             credentials: 'include',
             headers: this._headers
         })
             .then(this._getResponseData);
     } else {
-                return fetch(`${this._baseUrl}/cards/likes/${cardId}`, {
+                return fetch(`${this._baseUrl}/cards/${cardId}/likes`, {
             method: 'DELETE',
             credentials: 'include',
             headers: this._headers
@@ -93,7 +93,7 @@ export default class Api {
 
     //удаление лайка/отображение кол-ва лайков у карточки
     unlikeCard(cardId) {
-        return fetch(`${this._baseUrl}/cards/likes/${cardId}`, {
+        return fetch(`${this._baseUrl}/cards/${cardId}/likes`, {
             method: 'DELETE',
             credentials: 'include',
             headers: this._headers

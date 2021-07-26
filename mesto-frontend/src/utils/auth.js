@@ -104,7 +104,7 @@ export const authorize = (email, password) => {
 		.catch((err) => Promise.reject(err));
 };
 
-export const getPersonalData = (token) => {
+export const getPersonalData = () => {
 	return fetch(`${BASE_URL}/users/me`, {
 		method: "GET",
 		credentials: 'include',

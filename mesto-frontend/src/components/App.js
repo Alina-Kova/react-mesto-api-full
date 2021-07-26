@@ -91,9 +91,11 @@ function App() {
             setUserData({ email: res.data.email });
           }
         })
-        .catch((res) => {
-          console.log(`Ошибка: ${res.status}`);
-        })
+        .catch((err) => {
+          console.log(err);
+          setIsInfoTooltipSuccessful(false);
+          setIsInfoTooltipOpen(true);
+        });
     }
   }, [history])
   
@@ -105,8 +107,8 @@ function App() {
         .then((data) => {
           setCurrentUser(data);
         })
-        .catch((res) => {
-          console.log(`Ошибка: ${res.status}`);
+        .catch((err) => {
+        console.log(err);
         })
     }
   }, [loggedIn])
@@ -120,8 +122,8 @@ function App() {
         .then((card) => {
           setCards(card)
         })
-        .catch((res) => {
-          console.log(`Ошибка: ${res.status}`);
+        .catch((err) => {
+          console.log(err);
         })
     }
   }, [loggedIn])
