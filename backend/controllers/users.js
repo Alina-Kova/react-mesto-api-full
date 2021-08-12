@@ -1,6 +1,5 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-require('dotenv').config();
 
 const { NODE_ENV, JWT_SECRET } = process.env;
 const User = require('../models/users');
@@ -11,7 +10,7 @@ const ExistingDataError = require('../errors/existing-data-err');
 
 module.exports.getUser = (req, res, next) => {
   User.find({})
-    .then((user) => res.send(user))
+    .then((user) => res.send({ data: user }))
     .catch(next);
 };
 
@@ -21,7 +20,7 @@ module.exports.getMe = (req, res, next) => {
       if (!user) {
         throw new NotFoundError('Пользователь не найден.');
       }
-      return res.send(user);
+      return res.send({ data: user });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
@@ -33,12 +32,12 @@ module.exports.getMe = (req, res, next) => {
 };
 
 module.exports.getUserById = (req, res, next) => {
-  User.findById(req.params._id)
+  User.findById(req.params.id)
     .then((user) => {
       if (!user) {
         throw new NotFoundError('Пользователь не найден.');
       }
-      return res.send(user);
+      return res.send({ data: user });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
@@ -62,13 +61,9 @@ module.exports.createUser = (req, res, next) => {
       password: hash,
     }))
     .then((user) => {
-      res.status(200).send({
-        name: user.name,
-        about: user.about,
-        avatar: user.avatar,
-        _id: user._id,
-        email: user.email,
-      });
+      // eslint-disable-next-line no-shadow
+      const { _id, email } = user;
+      res.status(200).send({ _id, email });
     })
     .catch((err) => {
       if (err.name === 'MongoError' && err.code === 11000) {
@@ -94,7 +89,7 @@ module.exports.updateProfile = (req, res, next) => {
       if (!user) {
         throw new NotFoundError('Пользователь с указанным _id не найден.');
       }
-      return res.send(user);
+      return res.send({ data: user });
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -116,7 +111,7 @@ module.exports.updateAvatar = (req, res, next) => {
       if (!user) {
         throw new NotFoundError('Пользователь с указанным _id не найден.');
       }
-      return res.send(user);
+      return res.send({ data: user });
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -139,12 +134,8 @@ module.exports.login = (req, res, next) => {
         NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret',
         { expiresIn: '7d' },
       );
-        res.cookie('jwt', token, {
-          maxAge: 3600000 * 24 * 7,
-          httpOnly: true,
-          sameSite: true,
-        })
-        res.send({ email, _id: user._id });
+      // вернём токен
+      res.send({ token });
     })
     .catch(() => {
       // ошибка аутентификации
