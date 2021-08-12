@@ -1,15 +1,17 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const { errors, celebrate, Joi } = require('celebrate');
+const cors = require('cors');
+const helmet = require('helmet');
 const bodyParser = require('body-parser');
+// const cookieParser = require('cookie-parser');
 const cardsRoutes = require('./routes/cards');
 const usersRoutes = require('./routes/users');
 const { login, createUser } = require('./controllers/users');
+const { requestLogger, errorLogger } = require('./middlewares/logger');
 const auth = require('./middlewares/auth');
 const NotFoundError = require('./errors/not-found-err');
 require('dotenv').config();
-
-const { requestLogger, errorLogger } = require('./middlewares/logger');
 
 // Слушаем 3000 порт
 const { PORT = 3000 } = process.env;
@@ -17,6 +19,16 @@ const { PORT = 3000 } = process.env;
 // http://localhost:3000/users
 
 const app = express();
+
+app.use(cors({
+  origin: [
+    'https://alina.mesto.nomoredomains.monster',
+    'http://alina.mesto.nomoredomains.monster',
+    'http://localhost:3000',
+  ],
+  credentials: true,
+}));
+// app.options('*', cors());
 
 // подключаемся к серверу mongo
 mongoose.connect('mongodb://localhost:27017/mestodb', {
@@ -28,8 +40,11 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(helmet());
 
 app.use(requestLogger); // подключаем логгер запросов
+
+// app.use(cookieParser());
 
 app.use('/cards', auth, cardsRoutes);
 app.use('/users', auth, usersRoutes);
@@ -65,7 +80,7 @@ app.use(errorLogger); // подключаем логгер ошибок
 app.use(errors());
 
 // обрабатываем ошибку 404
-app.use(() => {
+app.use('*', () => {
   throw new NotFoundError('Карточка или пользователь не найден.');
 });
 // обрабатываем ошибку 500
