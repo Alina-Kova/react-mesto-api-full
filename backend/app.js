@@ -4,7 +4,7 @@ const { errors, celebrate, Joi } = require('celebrate');
 const cors = require('cors');
 const helmet = require('helmet');
 const bodyParser = require('body-parser');
-// const cookieParser = require('cookie-parser');
+const cookieParser = require('cookie-parser');
 const cardsRoutes = require('./routes/cards');
 const usersRoutes = require('./routes/users');
 const { login, createUser } = require('./controllers/users');
@@ -20,16 +20,6 @@ const { PORT = 3000 } = process.env;
 
 const app = express();
 
-app.use(cors({
-  origin: [
-    'https://alina.mesto.nomoredomains.monster',
-    'http://alina.mesto.nomoredomains.monster',
-    'http://localhost:3000',
-  ],
-  credentials: true,
-}));
-// app.options('*', cors());
-
 // подключаемся к серверу mongo
 mongoose.connect('mongodb://localhost:27017/mestodb', {
   useNewUrlParser: true,
@@ -38,13 +28,24 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
   useUnifiedTopology: true,
 });
 
+const corsOptions = {
+  origin: [
+    'http://localhost:3000',
+    'https://alina.mesto.nomoredomains.monster',
+    'http://alina.mesto.nomoredomains.monster',
+  ],
+  credentials: true,
+};
+
+// app.options('*', cors());
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(helmet());
+app.use(cookieParser());
+app.use(cors(corsOptions));
 
 app.use(requestLogger); // подключаем логгер запросов
-
-// app.use(cookieParser());
 
 app.use('/cards', auth, cardsRoutes);
 app.use('/users', auth, usersRoutes);
