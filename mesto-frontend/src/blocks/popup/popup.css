@@ -1,0 +1,26 @@
+.popup {
+    display: flex;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    visibility: hidden;
+    opacity: 0;
+    transition: visibility 0s linear 0.5s, opacity 0.5s linear;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 79px 19px 0;
+    /* так как иконка close перевернута на 45С и её диагональ на 10px больше высоты,
+    то прибавили 5px (половину от разницы диагонали и высоты) к padding-top */
+}
+
+@media screen and (min-width: 1280px) {
+    .popup {
+    padding: 155px 425px 0;
+    /* так как иконка close перевернута на 45С и её диагональ на 16px больше высоты,
+    то прибавили 8px (половину от разницы диагонали и высоты) к padding-top  */
+    }
+}
