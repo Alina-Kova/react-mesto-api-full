@@ -1,4 +1,4 @@
-export const BASE_URL = 'https://auth.nomoreparties.co';
+export const BASE_URL = 'https://api.alina.mesto.nomoredomains.monster';
 
 //получаем ответ с сервера
 const getResponse = (res) => {

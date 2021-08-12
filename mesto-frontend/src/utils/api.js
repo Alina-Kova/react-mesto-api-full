@@ -115,7 +115,7 @@ export default class Api {
 }
 
 export const api = new Api({
-	baseUrl: 'https://mesto.nomoreparties.co/v1/cohort-21',
+	baseUrl: 'https://api.alina.mesto.nomoredomains.monster',
 	headers: {
         authorization: `Bearer ${localStorage.getItem("token")}`,
         'Accept': 'application/json',
