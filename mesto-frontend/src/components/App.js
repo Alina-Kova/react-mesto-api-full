@@ -37,47 +37,96 @@ function App() {
   });
   //переменные состояния, определяющие залогинился ли пользователь
   const [loggedIn, setLoggedIn] = React.useState(false);
+  const [token, setToken] = React.useState('');
 
   const history = useHistory();
 
-  //передаем массив с данными пользователя и имеющимися карточками методу Promise.all
-  React.useEffect(() => {
-    Promise.all([api.getPersonalInfo(), api.getInitialCards()])
-      .then(([data, card]) => {
-        setCurrentUser(data);
-        setCards(card);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }, []);
+  // //передаем массив с данными пользователя и имеющимися карточками методу Promise.all
+  // React.useEffect(() => {
+  //   Promise.all([api.getPersonalInfo(), api.getInitialCards()])
+  //     .then(([data, card]) => {
+  //       setCurrentUser(data);
+  //       setCards(card);
+  //     })
+  //     .catch((err) => {
+  //       console.log(err);
+  //     });
+  // }, []);
 
+  // React.useEffect(() => {
+  //   //проверяем валидность токена пользователя
+  //   if (localStorage.getItem("token")) {
+  //     const token = localStorage.getItem("token");
+  //     auth.getPersonalData(token)
+  //       .then((res) => {
+  //         if (res) {
+  //           // авторизуем пользователя+получаем имейл пользователя
+  //           setUserData({ email: res.data.email });
+  //           setLoggedIn(true);
+  //           history.push("/");
+  //         }
+  //       })
+  //       //ловим ошибку и сообщаем пользователю в модальном окне
+  //       .catch((err) => {
+  //         console.log(err);
+  //         setIsInfoTooltipSuccessful(false);
+  //         setIsInfoTooltipOpen(true);
+  //       });
+  //   }
+  // }, [history]);
+
+  // авторизация по токену
   React.useEffect(() => {
-    //проверяем валидность токена пользователя
-    if (localStorage.getItem("token")) {
-      const token = localStorage.getItem("token");
+    const token = localStorage.getItem('token');
+    if (token) {
       auth.getPersonalData(token)
         .then((res) => {
           if (res) {
-            // авторизуем пользователя+получаем имейл пользователя
-            setUserData({ email: res.data.email });
+            setToken(token);
             setLoggedIn(true);
             history.push("/");
+            setUserData({ email: res.data.email });
           }
         })
-        //ловим ошибку и сообщаем пользователю в модальном окне
         .catch((err) => {
           console.log(err);
-          setIsInfoTooltipSuccessful(false);
-          setIsInfoTooltipOpen(true);
-        });
+        })
     }
-  }, [history]);
+  }, [history])
+  
+  // инфо пользователя
+  React.useEffect(() => {
+    const token = localStorage.getItem('token');
+    if(loggedIn) {
+      api.getPersonalInfo(token)
+        .then((data) => {
+          setCurrentUser(data);
+        })
+        .catch((err) => {
+          console.log(err);
+        })
+    }
+  }, [loggedIn])
+      
+    
+  // начальные карточки
+  React.useEffect(() => {
+    const token = localStorage.getItem('token');
+    if(loggedIn) {
+      api.getInitialCards(token)
+        .then((card) => {
+          setCards(card)
+        })
+        .catch((err) => {
+          console.log(err);
+        })
+    }
+  }, [loggedIn])
 
   //функция регистрации пользователя
   function handleRegister(email, password) {
     auth.register(email, password).then((res) => {
-      localStorage.setItem("token", res.token);
+      // localStorage.setItem("token", res.token);
       setUserData(res.data);
       setIsInfoTooltipSuccessful(true);
       history.push("/sign-in");
@@ -94,6 +143,7 @@ function App() {
     auth.authorize(email, password).then((res) => {
       if (res.token) {
         localStorage.setItem("token", res.token);
+        setToken(res.token);
         setUserData({ email: email });
         setLoggedIn(true);
         history.push("/");
@@ -101,8 +151,8 @@ function App() {
     })
       .catch((err) => {
         console.log(err);
-        setIsInfoTooltipSuccessful(false);
-        setIsInfoTooltipOpen(true);
+        // setIsInfoTooltipSuccessful(false);
+        // setIsInfoTooltipOpen(true);
       });
   }
 
@@ -148,7 +198,7 @@ function App() {
     // Снова проверяем, есть ли уже лайк на этой карточке
     const isLiked = card.likes.some(i => i._id === currentUser._id);
     // Отправляем запрос в API и получаем добавление кол-ва лайков
-    api.showLikesNumber(card._id, !isLiked).then((newCard) => {
+    api.showLikesNumber(card._id, !isLiked, token).then((newCard) => {
       setCards((cards) => cards.map((c) => c._id === card._id ? newCard : c));
     })
       .catch((err) => {
@@ -158,7 +208,7 @@ function App() {
 
   //функция удаления карточки
   function handleCardDelete(card) {
-    api.deleteCard(card._id).then(() => {
+    api.deleteCard(card._id, token).then(() => {
       setCards((cards) => cards.filter((c) => c._id !== card._id));
     })
       .catch((err) => {
@@ -168,7 +218,7 @@ function App() {
 
   //функция обновления данных пользователя
   function handleUpdateUser(data) {
-    api.showUserInfo(data).then((data) => {
+    api.showUserInfo(data, token).then((data) => {
       setCurrentUser(data);
       closeAllPopups();
     })
@@ -179,7 +229,7 @@ function App() {
 
   //функция изменения аватара
   function handleUpdateAvatar(data) {
-    api.editAvatar(data).then((data) => {
+    api.editAvatar(data, token).then((data) => {
       setCurrentUser(data);
       closeAllPopups();
     })
@@ -190,7 +240,7 @@ function App() {
 
   //функция добаления карточки
   function handleAddPlaceSubmit(data) {
-    api.addNewCard(data).then((newCard) => {
+    api.addNewCard(data, token).then((newCard) => {
       setCards([newCard, ...cards]);
       closeAllPopups();
     })
