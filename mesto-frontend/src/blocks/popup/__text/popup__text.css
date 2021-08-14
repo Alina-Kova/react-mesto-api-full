@@ -1,0 +1,28 @@
+.popup__text {
+    font-weight: normal;
+    font-size: 14px;
+    line-height: 17px;
+    color: #000000;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0 0 13px;
+    border: 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+    outline: none;
+    margin: 45px auto 0;
+}
+
+.popup__text::placeholder {
+    color: #C4C4C4;
+}
+
+/* .popup__text:invalid {
+    border-bottom: 1px solid red;
+} */
+
+@media screen and (min-width: 1280px) {
+    .popup__text {
+        width: 358px;
+        margin-top: 25px;
+    }
+}
