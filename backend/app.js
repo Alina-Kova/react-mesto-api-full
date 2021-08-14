@@ -28,22 +28,27 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
   useUnifiedTopology: true,
 });
 
-const corsOptions = {
-  origin: [
-    'http://localhost:3000',
-    'https://alina.mesto.nomoredomains.monster',
-    'http://alina.mesto.nomoredomains.monster',
-  ],
-  credentials: true,
-};
+// const corsOptions = {
+//   origin: [
+//     'http://localhost:3000',
+//     'https://alina.mesto.nomoredomains.monster',
+//     'http://alina.mesto.nomoredomains.monster',
+//   ],
+//   credentials: true,
+// };
 
 // app.options('*', cors());
+
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  next();
+});
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(helmet());
 app.use(cookieParser());
-app.use(cors(corsOptions));
+app.use(cors());
 
 app.use(requestLogger); // подключаем логгер запросов
 

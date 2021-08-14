@@ -138,13 +138,14 @@ module.exports.login = (req, res, next) => {
         maxAge: 3600000 * 24 * 7,
         httpOnly: true,
         sameSite: true,
-      });
-      // вернём токен
-      res.send({ token });
+      })
+        .send({ token });
     })
-    .catch(() => {
-      // ошибка аутентификации
-      throw new AuthorizationError('Передан неверный логин или пароль.');
-    })
-    .catch(next);
+    // .catch(() => {
+    //   // ошибка аутентификации
+    //   throw new AuthorizationError('Передан неверный логин или пароль.');
+    // })
+    // ошибка аутентификации
+    .catch((err) => next(new AuthorizationError(err.message)));
+// .catch(next);
 };
