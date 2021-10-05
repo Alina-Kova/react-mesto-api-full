@@ -42,37 +42,69 @@ function App() {
 
   //передаем массив с данными пользователя и имеющимися карточками методу Promise.all
   React.useEffect(() => {
-    Promise.all([api.getPersonalInfo(), api.getInitialCards()])
-      .then(([data, card]) => {
-        setCurrentUser(data);
-        setCards(card);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+    // fix
+    if (loggedIn) {
+      Promise.all([api.getPersonalInfo(), api.getInitialCards()])
+        .then(([data, card]) => {
+          // setCurrentUser(data);
+          // setCards(card);
+          setCurrentUser(data.currentUser);
+          setCards(card.card);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+      // fix
+    }
+  }, [loggedIn]);
+  // }, []);
+
+  // React.useEffect(() => {
+  //   //проверяем валидность токена пользователя
+  //   if (localStorage.getItem("token")) {
+  //     const token = localStorage.getItem("token");
+  //     auth.getPersonalData(token)
+  //       .then((res) => {
+  //         if (res) {
+  //           // авторизуем пользователя+получаем имейл пользователя
+  //           setUserData({ email: res.data.email });
+  //           setLoggedIn(true);
+  //           history.push("/");
+  //         }
+  //       })
+  //       //ловим ошибку и сообщаем пользователю в модальном окне
+  //       .catch((err) => {
+  //         console.log(err);
+  //         setIsInfoTooltipSuccessful(false);
+  //         setIsInfoTooltipOpen(true);
+  //       });
+  //   }
+  // }, [history]);
+
+  function checkToken() {
+    const token = localStorage.getItem('token')
+    if (token) {
+            console.log(token);
+      auth.getPersonalData(token)
+        .then(res => {
+          setUserData(res.currentUser.email);
+          setLoggedIn(true);
+        })
+        .catch((err) => {
+          console.log(err);
+        })
+    }
+  }
+
+  React.useEffect(() => {
+    checkToken()
   }, []);
 
   React.useEffect(() => {
-    //проверяем валидность токена пользователя
-    if (localStorage.getItem("token")) {
-      const token = localStorage.getItem("token");
-      auth.getPersonalData(token)
-        .then((res) => {
-          if (res) {
-            // авторизуем пользователя+получаем имейл пользователя
-            setUserData({ email: res.data.email });
-            setLoggedIn(true);
-            history.push("/");
-          }
-        })
-        //ловим ошибку и сообщаем пользователю в модальном окне
-        .catch((err) => {
-          console.log(err);
-          setIsInfoTooltipSuccessful(false);
-          setIsInfoTooltipOpen(true);
-        });
+    if (loggedIn) {
+      history.push('/')
     }
-  }, [history]);
+  }, [history, loggedIn]);
 
   //функция регистрации пользователя
   function handleRegister(email, password) {

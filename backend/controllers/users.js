@@ -16,11 +16,11 @@ module.exports.getUser = (req, res, next) => {
 
 module.exports.getMe = (req, res, next) => {
   User.findById(req.user._id)
-    .then((user) => {
-      if (!user) {
+    .then((currentUser) => {
+      if (!currentUser) {
         throw new NotFoundError('Пользователь не найден.');
       }
-      return res.send(user);
+      return res.send(currentUser);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
@@ -134,18 +134,18 @@ module.exports.login = (req, res, next) => {
         NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret',
         { expiresIn: '7d' },
       );
-      res.cookie('jwt', token, {
-        maxAge: 3600000 * 24 * 7,
-        httpOnly: true,
-        sameSite: true,
-      })
-        .send({ token });
+      // res.cookie('jwt', token, {
+      //   maxAge: 3600000 * 24 * 7,
+      //   httpOnly: true,
+      //   sameSite: true,
+      // })
+      // вернём токен
+      return res.send({ token });
     })
-    // .catch(() => {
-    //   // ошибка аутентификации
-    //   throw new AuthorizationError('Передан неверный логин или пароль.');
-    // })
     // ошибка аутентификации
-    .catch((err) => next(new AuthorizationError(err.message)));
-// .catch(next);
+    .catch(() => {
+      throw new AuthorizationError('Передан неверный логин или пароль.');
+    })
+    // .catch((err) => next(new AuthorizationError(err.message)));
+    .catch(next);
 };

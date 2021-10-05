@@ -4,12 +4,13 @@ const { errors, celebrate, Joi } = require('celebrate');
 const cors = require('cors');
 const helmet = require('helmet');
 const bodyParser = require('body-parser');
-const cookieParser = require('cookie-parser');
+// const cookieParser = require('cookie-parser');
 const cardsRoutes = require('./routes/cards');
 const usersRoutes = require('./routes/users');
 const { login, createUser } = require('./controllers/users');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 const auth = require('./middlewares/auth');
+const { handleCors } = require('./middlewares/cors');
 const NotFoundError = require('./errors/not-found-err');
 require('dotenv').config();
 
@@ -37,17 +38,40 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
 //   credentials: true,
 // };
 
+// // eslint-disable-next-line consistent-return
+// app.use((req, res, next) => {
+//   const { origin } = req.headers; // Сохраняем источник запроса в переменную origin
+//   // проверяем, что источник запроса есть среди разрешённых
+//   if (corsOptions.includes(origin)) {
+//     // устанавливаем заголовок, который разрешает браузеру запросы с этого источника
+//     res.header('Access-Control-Allow-Origin', '*');
+//   }
+//   const { method } = req;
+//   const DEFAULT_ALLOWED_METHODS = 'GET,HEAD,PUT,PATCH,POST,DELETE';
+//   const requestHeaders = req.headers['access-control-request-headers'];
+//   if (method === 'OPTIONS') {
+//     // разрешаем кросс-доменные запросы любых типов (по умолчанию)
+//     res.header('Access-Control-Allow-Methods', DEFAULT_ALLOWED_METHODS);
+//     // разрешаем кросс-доменные запросы с этими заголовками
+//     res.header('Access-Control-Allow-Headers', requestHeaders);
+//     // завершаем обработку запроса и возвращаем результат клиенту
+//     return res.end();
+//   }
+//   next();
+// });
+
 // app.options('*', cors());
 
-app.use((req, res, next) => {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  next();
-});
+// app.use((req, res, next) => {
+//   res.setHeader('Access-Control-Allow-Origin', '*');
+//   next();
+// });
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(helmet());
-app.use(cookieParser());
+// app.use(cookieParser());
+app.use(handleCors());
 app.use(cors());
 
 app.use(requestLogger); // подключаем логгер запросов
@@ -81,7 +105,7 @@ app.use(errors());
 
 // обрабатываем ошибку 404
 app.use('*', () => {
-  throw new NotFoundError('Карточка или пользователь не найден.');
+  throw new NotFoundError('Запрашиваемый ресурс не найден.');
 });
 // обрабатываем ошибку 500
 app.use((err, req, res, next) => {
