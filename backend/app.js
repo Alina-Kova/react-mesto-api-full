@@ -4,13 +4,12 @@ const { errors, celebrate, Joi } = require('celebrate');
 const cors = require('cors');
 const helmet = require('helmet');
 const bodyParser = require('body-parser');
-// const cookieParser = require('cookie-parser');
 const cardsRoutes = require('./routes/cards');
 const usersRoutes = require('./routes/users');
 const { login, createUser } = require('./controllers/users');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 const auth = require('./middlewares/auth');
-const { handleCors } = require('./middlewares/cors');
+// const { handleCors } = require('./middlewares/cors');
 const NotFoundError = require('./errors/not-found-err');
 require('dotenv').config();
 
@@ -70,8 +69,7 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(helmet());
-// app.use(cookieParser());
-app.use(handleCors());
+// app.use(handleCors());
 app.use(cors());
 
 app.use(requestLogger); // подключаем логгер запросов
