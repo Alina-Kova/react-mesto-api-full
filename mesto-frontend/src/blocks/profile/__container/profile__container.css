@@ -1,0 +1,15 @@
+.profile__container {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    margin-bottom: 14px;
+    align-items: center;
+}
+
+@media screen and (min-width: 1280px) {
+    .profile__container {
+        margin-bottom: 16px;
+        justify-content: flex-start;
+    }
+}
