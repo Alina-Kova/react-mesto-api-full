@@ -24,9 +24,9 @@ function App() {
   //переменные состояния, отвечающие за видимость модального окна с инфой об успешной или нет регистрации
   const [isInfoTooltipOpen, setIsInfoTooltipOpen] = React.useState(false);
   //переменные состояния, определяющие успешно ли регистрируется/логинится пользователь
-  const [isInfoTooltipSuccessful, setIsInfoTooltipSuccessful] = React.useState(true);
+  const [isInfoTooltipSuccessful, setIsInfoTooltipSuccessful] = React.useState(false);
   //переменные состояния, отвечающие за видимость попапа с картинкой
-  const [selectedCard, setSelectedCard] = React.useState(false);
+  const [selectedCard, setSelectedCard] = React.useState(null);
   //переменные состояния, определяющие данные текущего пользователя
   const [currentUser, setCurrentUser] = React.useState({});
   //переменные состояния с пустым массивом карточек, подтягивает данные о карточках через API
@@ -42,22 +42,31 @@ function App() {
 
   //передаем массив с данными пользователя и имеющимися карточками методу Promise.all
   React.useEffect(() => {
-    // fix
     if (loggedIn) {
       Promise.all([api.getPersonalInfo(), api.getInitialCards()])
         .then(([data, card]) => {
-          // setCurrentUser(data);
-          // setCards(card);
-          setCurrentUser(data.currentUser);
-          setCards(card.card);
+          setCurrentUser(data);
+          setCards(card);
         })
         .catch((err) => {
           console.log(err);
         });
-      // fix
     }
   }, [loggedIn]);
-  // }, []);
+
+  React.useEffect(() => {
+    auth.getPersonalData()
+      .then((res) => {
+        // авторизуем пользователя+получаем имейл пользователя
+        setUserData({ email: res.data.email });
+        setLoggedIn(true);
+        history.push("/");
+      })
+      //ловим ошибку и сообщаем пользователю в модальном окне
+      .catch((err) => {
+        console.log(err);
+      });
+  }, [history]);
 
   // React.useEffect(() => {
   //   //проверяем валидность токена пользователя
@@ -81,69 +90,82 @@ function App() {
   //   }
   // }, [history]);
 
-  function checkToken() {
-    const token = localStorage.getItem('token')
-    if (token) {
-            console.log(token);
-      auth.getPersonalData(token)
-        .then(res => {
-          setUserData(res.currentUser.email);
-          setLoggedIn(true);
-        })
-        .catch((err) => {
-          console.log(err);
-        })
-    }
-  }
+//////////////////////
+  // function checkToken() {
+  //   const token = localStorage.getItem('token')
+  //   if (token) {
+  //           console.log(token);
+  //     auth.getPersonalData(token)
+  //       .then(res => {
+  //         setUserData(res.currentUser.email);
+  //         setLoggedIn(true);
+  //       })
+  //       .catch((err) => {
+  //         console.log(err);
+  //       })
+  //   }
+  // }
 
-  React.useEffect(() => {
-    checkToken()
-  }, []);
+  // React.useEffect(() => {
+  //   checkToken()
+  // }, []);
 
-  React.useEffect(() => {
-    if (loggedIn) {
-      history.push('/')
-    }
-  }, [history, loggedIn]);
+  // React.useEffect(() => {
+  //   if (loggedIn) {
+  //     history.push('/')
+  //   }
+  // }, [history, loggedIn]);
+
+    /////////////////////////
 
   //функция регистрации пользователя
+  // function handleRegister(email, password) {
+  //   auth.register(email, password).then((res) => {
+  //     localStorage.setItem("token", res.token);
+  //     setUserData(res.data);
+  //     setIsInfoTooltipSuccessful(true);
+  //     history.push("/sign-in");
+  //   })
+  //     .catch((err) => {
+  //       console.log(err);
+  //       setIsInfoTooltipSuccessful(false);
+  //     })
+  //     .finally(() => setIsInfoTooltipOpen(true));
+  // }
   function handleRegister(email, password) {
-    auth.register(email, password).then((res) => {
-      localStorage.setItem("token", res.token);
-      setUserData(res.data);
-      setIsInfoTooltipSuccessful(true);
+    auth.register(email, password).then(() => {
       history.push("/sign-in");
+      setIsInfoTooltipOpen(true);
+      setIsInfoTooltipSuccessful(true);
     })
       .catch((err) => {
         console.log(err);
+        setIsInfoTooltipOpen(true);
         setIsInfoTooltipSuccessful(false);
-      })
-      .finally(() => setIsInfoTooltipOpen(true));
+      });
   }
 
   //функция авторизации пользователя
   function handleLogin(email, password) {
-    auth.authorize(email, password).then((res) => {
-      if (res.token) {
-        localStorage.setItem("token", res.token);
-        setUserData({ email: email });
+    auth.authorize(email, password).then(() => {
         setLoggedIn(true);
         history.push("/");
-      }
+        setUserData({ email: email });
     })
       .catch((err) => {
         console.log(err);
-        setIsInfoTooltipSuccessful(false);
         setIsInfoTooltipOpen(true);
+        setIsInfoTooltipSuccessful(false);
       });
   }
 
   //функция выхода пользователя из аккаунта
   function handleLogout() {
-    localStorage.removeItem("token");
-    setLoggedIn(false);
-    setUserData({ email: "" });
-    history.push("/sign-in");
+    auth.logout().then(() => {
+      setLoggedIn(false);
+      setUserData({ email: "" });
+      history.push("/sign-in");
+    })
   }
 
   //обработчик формы изменения аватара

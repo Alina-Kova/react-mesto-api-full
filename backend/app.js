@@ -4,14 +4,15 @@ const { errors, celebrate, Joi } = require('celebrate');
 const cors = require('cors');
 const helmet = require('helmet');
 const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
 const cardsRoutes = require('./routes/cards');
 const usersRoutes = require('./routes/users');
 const { login, createUser } = require('./controllers/users');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 const auth = require('./middlewares/auth');
-// const { handleCors } = require('./middlewares/cors');
 const NotFoundError = require('./errors/not-found-err');
 require('dotenv').config();
+// const { handleCors } = require('./middlewares/cors');
 
 // Слушаем 3000 порт
 const { PORT = 3000 } = process.env;
@@ -27,6 +28,19 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
   useFindAndModify: false,
   useUnifiedTopology: true,
 });
+
+app.use(cors({
+  origin: [
+    'http://localhost:3000',
+    'https://localhost:3000',
+    'https://alina.mesto.nomoredomains.monster',
+    'http://alina.mesto.nomoredomains.monster',
+    'https://api.alina.mesto.nomoredomains.monster',
+    'http://api.alina.mesto.nomoredomains.monster',
+
+  ],
+  credentials: true,
+}));
 
 // const corsOptions = {
 //   origin: [
@@ -69,13 +83,19 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(helmet());
+app.use(cookieParser());
 // app.use(handleCors());
-app.use(cors());
 
 app.use(requestLogger); // подключаем логгер запросов
 
-app.use('/cards', auth, cardsRoutes);
+// app.get('/crash-test', () => {
+//   setTimeout(() => {
+//     throw new Error('Сервер сейчас упадёт');
+//   }, 0);
+// });
+
 app.use('/users', auth, usersRoutes);
+app.use('/cards', auth, cardsRoutes);
 app.post('/signin', celebrate({
   body: Joi.object().keys({
     email: Joi.string().required().email(),

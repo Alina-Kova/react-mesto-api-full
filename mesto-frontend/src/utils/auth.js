@@ -14,8 +14,9 @@ const getResponse = (res) => {
 export const register = (email, password) => {
     return fetch(`${BASE_URL}/signup`, {
         method: 'POST',
+        credentials: 'include',
         headers: {
-            // 'Accept': 'application/json',
+            'Accept': 'application/json',
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({ email, password })
@@ -27,8 +28,9 @@ export const register = (email, password) => {
 export const authorize = (email, password) => {
     return fetch(`${BASE_URL}/signin`, {
         method: 'POST',
+        credentials: 'include',
         headers: {
-            // 'Accept': 'application/json',
+            'Accept': 'application/json',
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({ email, password })
@@ -36,16 +38,20 @@ export const authorize = (email, password) => {
         .then(getResponse)
 };
 
-// отправляем запрос и получаем информацию о пользователе в шапку
-export const getPersonalData = (token) => {
+//отправляем запрос и получаем информацию о пользователе в шапку
+export const getPersonalData = () => {
     return fetch(`${BASE_URL}/users/me`, {
         method: 'GET',
-        headers: {
-            // 'Accept': 'application/json',
-            'Content-Type': 'application/json',
-            // 'Authorization': `Bearer ${token}`
-            'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        }
+        credentials: 'include',
     })
         .then(getResponse)
 };
+
+//делаем логаут
+export const logout = () => {
+    return fetch(`${BASE_URL}/logout`, {
+      method: 'GET',
+      credentials: 'include',
+    })
+      .then(getResponse)
+  }

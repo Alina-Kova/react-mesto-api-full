@@ -3,7 +3,7 @@ import React from 'react';
 import { Route, Switch, Link } from 'react-router-dom';
 
 
-export function Header(props) {
+export function Header(props) { 
     return (
         <header className="header">
             <img src={logo} alt="логотип Место" className="header__logo" />
