@@ -1,17 +1,17 @@
+require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const { errors, celebrate, Joi } = require('celebrate');
 const cors = require('cors');
 const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
 const bodyParser = require('body-parser');
-const cookieParser = require('cookie-parser');
 const cardsRoutes = require('./routes/cards');
 const usersRoutes = require('./routes/users');
 const { login, createUser } = require('./controllers/users');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 const auth = require('./middlewares/auth');
 const NotFoundError = require('./errors/not-found-err');
-require('dotenv').config();
 // const { handleCors } = require('./middlewares/cors');
 
 // Слушаем 3000 порт
@@ -29,7 +29,7 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
   useUnifiedTopology: true,
 });
 
-app.use(cors({
+const corsOptions = {
   origin: [
     'http://localhost:3000',
     'https://localhost:3000',
@@ -40,62 +40,29 @@ app.use(cors({
 
   ],
   credentials: true,
-}));
+  methods: ['GET,HEAD,PUT,PATCH,POST,DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+};
 
-// const corsOptions = {
-//   origin: [
-//     'http://localhost:3000',
-//     'https://alina.mesto.nomoredomains.monster',
-//     'http://alina.mesto.nomoredomains.monster',
-//   ],
-//   credentials: true,
-// };
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+});
 
-// // eslint-disable-next-line consistent-return
-// app.use((req, res, next) => {
-//   const { origin } = req.headers; // Сохраняем источник запроса в переменную origin
-//   // проверяем, что источник запроса есть среди разрешённых
-//   if (corsOptions.includes(origin)) {
-//     // устанавливаем заголовок, который разрешает браузеру запросы с этого источника
-//     res.header('Access-Control-Allow-Origin', '*');
-//   }
-//   const { method } = req;
-//   const DEFAULT_ALLOWED_METHODS = 'GET,HEAD,PUT,PATCH,POST,DELETE';
-//   const requestHeaders = req.headers['access-control-request-headers'];
-//   if (method === 'OPTIONS') {
-//     // разрешаем кросс-доменные запросы любых типов (по умолчанию)
-//     res.header('Access-Control-Allow-Methods', DEFAULT_ALLOWED_METHODS);
-//     // разрешаем кросс-доменные запросы с этими заголовками
-//     res.header('Access-Control-Allow-Headers', requestHeaders);
-//     // завершаем обработку запроса и возвращаем результат клиенту
-//     return res.end();
-//   }
-//   next();
-// });
-
-// app.options('*', cors());
-
-// app.use((req, res, next) => {
-//   res.setHeader('Access-Control-Allow-Origin', '*');
-//   next();
-// });
-
+app.use(cors(corsOptions));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(helmet());
-app.use(cookieParser());
-// app.use(handleCors());
+app.use(limiter);
 
 app.use(requestLogger); // подключаем логгер запросов
 
-// app.get('/crash-test', () => {
-//   setTimeout(() => {
-//     throw new Error('Сервер сейчас упадёт');
-//   }, 0);
-// });
+app.get('/crash-test', () => {
+  setTimeout(() => {
+    throw new Error('Сервер сейчас упадёт');
+  }, 0);
+});
 
-app.use('/users', auth, usersRoutes);
-app.use('/cards', auth, cardsRoutes);
 app.post('/signin', celebrate({
   body: Joi.object().keys({
     email: Joi.string().required().email(),
@@ -113,18 +80,23 @@ app.post('/signup', celebrate({
   }),
 }), createUser);
 
+app.use(auth);
+app.use('/users', usersRoutes);
+app.use('/cards', cardsRoutes);
+
 // обработчики ошибок
 
 // подключаем логгер ошибок
 app.use(errorLogger);
 
-// обработчик ошибок celebrate
-app.use(errors());
-
 // обрабатываем ошибку 404
 app.use('*', () => {
   throw new NotFoundError('Запрашиваемый ресурс не найден.');
 });
+
+// обработчик ошибок celebrate
+app.use(errors());
+
 // обрабатываем ошибку 500
 app.use((err, req, res, next) => {
   // если у ошибки нет статуса, выставляем 500
@@ -141,4 +113,8 @@ app.use((err, req, res, next) => {
   next();
 });
 
-app.listen(PORT);
+// app.listen(PORT);
+app.listen(PORT, () => {
+  // eslint-disable-next-line no-console
+  console.log(`App listening on port ${PORT}`);
+});

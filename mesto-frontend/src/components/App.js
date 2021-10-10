@@ -37,101 +37,54 @@ function App() {
   });
   //переменные состояния, определяющие залогинился ли пользователь
   const [loggedIn, setLoggedIn] = React.useState(false);
-
   const history = useHistory();
+  const [token, setToken] = React.useState('');
 
-  //передаем массив с данными пользователя и имеющимися карточками методу Promise.all
-  React.useEffect(() => {
-    if (loggedIn) {
-      Promise.all([api.getPersonalInfo(), api.getInitialCards()])
-        .then(([data, card]) => {
-          setCurrentUser(data);
-          setCards(card);
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    }
-  }, [loggedIn]);
+  //проверяем валидность токена пользователя
+  const checkToken = React.useCallback(
+    () => {
+    const token = localStorage.getItem('token');
 
-  React.useEffect(() => {
-    auth.getPersonalData()
-      .then((res) => {
+    if (token) {
+      setToken(token);
+
+    auth.getPersonalData(token)
+    .then((res) => {
+      if (res) {
         // авторизуем пользователя+получаем имейл пользователя
-        setUserData({ email: res.data.email });
         setLoggedIn(true);
+        setUserData({ email: res.email });
         history.push("/");
-      })
-      //ловим ошибку и сообщаем пользователю в модальном окне
+      }
+    })
       .catch((err) => {
         console.log(err);
       });
-  }, [history]);
+    }
+  }, 
+  [history]
+  );
 
-  // React.useEffect(() => {
-  //   //проверяем валидность токена пользователя
-  //   if (localStorage.getItem("token")) {
-  //     const token = localStorage.getItem("token");
-  //     auth.getPersonalData(token)
-  //       .then((res) => {
-  //         if (res) {
-  //           // авторизуем пользователя+получаем имейл пользователя
-  //           setUserData({ email: res.data.email });
-  //           setLoggedIn(true);
-  //           history.push("/");
-  //         }
-  //       })
-  //       //ловим ошибку и сообщаем пользователю в модальном окне
-  //       .catch((err) => {
-  //         console.log(err);
-  //         setIsInfoTooltipSuccessful(false);
-  //         setIsInfoTooltipOpen(true);
-  //       });
-  //   }
-  // }, [history]);
+  React.useEffect(() => {
+    checkToken();
+  }, [checkToken])
 
-//////////////////////
-  // function checkToken() {
-  //   const token = localStorage.getItem('token')
-  //   if (token) {
-  //           console.log(token);
-  //     auth.getPersonalData(token)
-  //       .then(res => {
-  //         setUserData(res.currentUser.email);
-  //         setLoggedIn(true);
-  //       })
-  //       .catch((err) => {
-  //         console.log(err);
-  //       })
-  //   }
-  // }
-
-  // React.useEffect(() => {
-  //   checkToken()
-  // }, []);
-
-  // React.useEffect(() => {
-  //   if (loggedIn) {
-  //     history.push('/')
-  //   }
-  // }, [history, loggedIn]);
-
-    /////////////////////////
+  React.useEffect(() => {
+    if (loggedIn) {
+      const token = localStorage.getItem('token');
+      api.getData(token)
+        .then((res) => {
+          const [data, card] = res;
+          setCurrentUser(data);
+          setCards(card.reverse());
+        })
+        .catch((err) => {
+          console.log(err);
+        })
+    }
+  }, [loggedIn])
 
   //функция регистрации пользователя
-  // function handleRegister(email, password) {
-  //   auth.register(email, password).then((res) => {
-  //     localStorage.setItem("token", res.token);
-  //     setUserData(res.data);
-  //     setIsInfoTooltipSuccessful(true);
-  //     history.push("/sign-in");
-  //   })
-  //     .catch((err) => {
-  //       console.log(err);
-  //       setIsInfoTooltipSuccessful(false);
-  //     })
-  //     .finally(() => setIsInfoTooltipOpen(true));
-  // }
   function handleRegister(email, password) {
     auth.register(email, password).then(() => {
       history.push("/sign-in");
@@ -147,25 +100,25 @@ function App() {
 
   //функция авторизации пользователя
   function handleLogin(email, password) {
-    auth.authorize(email, password).then(() => {
+    auth.authorize(email, password).then((res) => {
         setLoggedIn(true);
-        history.push("/");
+        localStorage.setItem('token', res.token);
+        setToken(res.token);
         setUserData({ email: email });
-    })
+        history.push("/");
+      })
       .catch((err) => {
         console.log(err);
-        setIsInfoTooltipOpen(true);
-        setIsInfoTooltipSuccessful(false);
-      });
+      })  
   }
 
   //функция выхода пользователя из аккаунта
-  function handleLogout() {
-    auth.logout().then(() => {
-      setLoggedIn(false);
-      setUserData({ email: "" });
-      history.push("/sign-in");
-    })
+  function handleLogout() {  
+    setLoggedIn(false);
+    localStorage.removeItem('token');
+    setToken('');
+    setUserData({ email: "" });
+    history.push("/sign-in");
   }
 
   //обработчик формы изменения аватара
@@ -200,9 +153,9 @@ function App() {
   //функция добавления/удаления лайка
   function handleCardLike(card) {
     // Снова проверяем, есть ли уже лайк на этой карточке
-    const isLiked = card.likes.some(i => i._id === currentUser._id);
+    const isLiked = card.likes.some((i) => i === currentUser._id);
     // Отправляем запрос в API и получаем добавление кол-ва лайков
-    api.showLikesNumber(card._id, !isLiked).then((newCard) => {
+    api.showLikesNumber(card._id, !isLiked, token).then((newCard) => {
       setCards((cards) => cards.map((c) => c._id === card._id ? newCard : c));
     })
       .catch((err) => {
@@ -212,7 +165,7 @@ function App() {
 
   //функция удаления карточки
   function handleCardDelete(card) {
-    api.deleteCard(card._id).then(() => {
+    api.deleteCard(card._id, token).then(() => {
       setCards((cards) => cards.filter((c) => c._id !== card._id));
     })
       .catch((err) => {
@@ -222,7 +175,7 @@ function App() {
 
   //функция обновления данных пользователя
   function handleUpdateUser(data) {
-    api.showUserInfo(data).then((data) => {
+    api.showUserInfo(data, token).then((data) => {
       setCurrentUser(data);
       closeAllPopups();
     })
@@ -233,7 +186,7 @@ function App() {
 
   //функция изменения аватара
   function handleUpdateAvatar(data) {
-    api.editAvatar(data).then((data) => {
+    api.editAvatar(data, token).then((data) => {
       setCurrentUser(data);
       closeAllPopups();
     })
@@ -244,7 +197,7 @@ function App() {
 
   //функция добаления карточки
   function handleAddPlaceSubmit(data) {
-    api.addNewCard(data).then((newCard) => {
+      api.addNewCard(data, token).then((newCard) => {
       setCards([newCard, ...cards]);
       closeAllPopups();
     })
@@ -258,7 +211,7 @@ function App() {
       <CurrentUserContext.Provider value={currentUser}>
         <div className="page">
 
-          <Header handleLogout={handleLogout} userData={userData} />
+          <Header loggedIn={loggedIn} handleLogout={handleLogout} userData={userData} />
 
           <Switch>
 
@@ -275,7 +228,7 @@ function App() {
               loggedIn={loggedIn} />
 
             <Route path="/sign-in">
-              <Login onLogin={handleLogin}></Login>
+              <Login onLogin={handleLogin} ></Login>
             </Route>
 
             <Route path="/sign-up">

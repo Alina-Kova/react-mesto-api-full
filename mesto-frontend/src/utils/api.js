@@ -1,10 +1,9 @@
 export default class Api {
     constructor({ baseUrl, headers }) {
         this._baseUrl = baseUrl;
-        // this._headers = headers;
+        this._headers = headers;
     }
 
-    //получение ответа с сервера
     _getResponseData(res) {
         //в случае ошибки
         if (!res.ok) {
@@ -14,31 +13,33 @@ export default class Api {
         return res.json();
     }
 
+    //передаем массив с данными пользователя и имеющимися карточками методу Promise.all
+    getData(token) {
+        return Promise.all([this.getPersonalInfo(token), this.getInitialCards(token)]);
+    }
+
     //получение информации о пользователе с сервера
-    getPersonalInfo() {
+    getPersonalInfo(token) {
         return fetch(`${this._baseUrl}/users/me`, {
-            credentials: 'include',
-            // headers: this._headers
+            method: 'GET',
+            headers: {...this._headers, Authorization: `Bearer ${token}`},
         })
             .then(this._getResponseData);
     }
 
     //получение карточек пользователей с сервера
-    getInitialCards() {
+    getInitialCards(token) {
         return fetch(`${this._baseUrl}/cards`, {
-            credentials: 'include',
+            headers: {...this._headers, Authorization: `Bearer ${token}`},
         })
             .then(this._getResponseData);
     }
 
     //отправка информации о пользователе на сервер
-    showUserInfo(data) {
+    showUserInfo(data, token) {
         return fetch(`${this._baseUrl}/users/me`, {
             method: 'PATCH',
-            credentials: 'include',
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            headers: {...this._headers, Authorization: `Bearer ${token}`},
             body: JSON.stringify({
                 name: data.name,
                 about: data.about
@@ -48,64 +49,60 @@ export default class Api {
     }
 
     //добавление карточки
-    addNewCard(data) {
+    addNewCard(data, token) {
         return fetch(`${this._baseUrl}/cards`, {
             method: 'POST',
-            credentials: 'include',
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            headers: {...this._headers, Authorization: `Bearer ${token}`},
             body: JSON.stringify({
                 link: data.link,
                 name: data.name
+
             })
         })
             .then(this._getResponseData);
     }
 
-    //добавление лайка/отображение кол-ва лайков у карточки
-    showLikesNumber(cardId, isLiked) {
-        if (isLiked) {
-        return fetch(`${this._baseUrl}/cards/likes/${cardId}`, {
+    //добавление лайка
+    likeCard(cardId, token) {
+        return fetch(`${this._baseUrl}/cards/${cardId}/likes`, {
             method: 'PUT',
-            credentials: 'include',
+            headers: {...this._headers, Authorization: `Bearer ${token}`},
         })
-            .then(this._getResponseData);
-    } else {
-                return fetch(`${this._baseUrl}/cards/likes/${cardId}`, {
-            method: 'DELETE',
-            credentials: 'include',
-        })
-            .then(this._getResponseData);
+            .then(this._getResponseData)
     }
+
+    //удаление лайка
+    unlikeCard(cardId, token) {
+        return fetch(`${this._baseUrl}/cards/${cardId}/likes`, {
+            method: 'DELETE',
+            headers: {...this._headers, Authorization: `Bearer ${token}`},
+        })
+            .then(this._getResponseData)
+    }
+
+    //отображение кол-ва лайков у карточки
+    showLikesNumber(cardId, isLiked, token) {
+        if (isLiked) {
+            return this.likeCard(cardId, token);
+        } else {
+            return this.unlikeCard(cardId, token);
+        }
     }
 
     //удаление своей карточки
-    deleteCard(cardId) {
+    deleteCard(cardId, token) {
         return fetch(`${this._baseUrl}/cards/${cardId}`, {
             method: 'DELETE',
-            credentials: 'include',
+            headers: {...this._headers, Authorization: `Bearer ${token}`},
         })
             .then(this._getResponseData);
     }
 
-    //удаление лайка/отображение кол-ва лайков у карточки
-    unlikeCard(cardId) {
-        return fetch(`${this._baseUrl}/cards/likes/${cardId}`, {
-            method: 'DELETE',
-            credentials: 'include',
-        })
-            .then(this._getResponseData);
-    }
-
-    //изменение аватара
-    editAvatar(data) {
+    // изменение аватара
+    editAvatar(data, token) {
         return fetch(`${this._baseUrl}/users/me/avatar`, {
             method: 'PATCH',
-            credentials: 'include',
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            headers: {...this._headers, Authorization: `Bearer ${token}`},
             body: JSON.stringify({
                 avatar: data.avatar
             })
@@ -114,10 +111,10 @@ export default class Api {
     }
 }
 
-export const api = new Api({ 
-	baseUrl: 'https://api.alina.mesto.nomoredomains.monster',
-	// headers: {
-	// 	'authorization': `Bearer ${localStorage.getItem('token')}`,
-	// 	'Content-Type': 'application/json'
-	// }
+export const api = new Api({
+    baseUrl: 'https://api.alina.mesto.nomoredomains.monster',
+    headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+    }
 })
