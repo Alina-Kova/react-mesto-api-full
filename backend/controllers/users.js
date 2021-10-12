@@ -63,7 +63,7 @@ module.exports.createUser = (req, res, next) => {
     .then((user) => {
       // eslint-disable-next-line no-shadow
       const { _id, email } = user;
-      res.send({ _id, email });
+      res.status(200).send({ _id, email });
     })
     .catch((err) => {
       if (err.name === 'MongoError' && err.code === 11000) {
@@ -134,12 +134,18 @@ module.exports.login = (req, res, next) => {
         NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret',
         { expiresIn: '7d' },
       );
+      // res.cookie('jwt', token, {
+      //   maxAge: 3600000 * 24 * 7,
+      //   httpOnly: true,
+      //   sameSite: true,
+      // })
       // вернём токен
       return res.send({ token });
     })
     // ошибка аутентификации
     .catch(() => {
-      throw new AuthorizationError('Передан неверный логин или пароль');
+      throw new AuthorizationError('Передан неверный логин или пароль.');
     })
+    // .catch((err) => next(new AuthorizationError(err.message)));
     .catch(next);
 };

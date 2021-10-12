@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 const jwt = require('jsonwebtoken');
 const AuthorizationError = require('../errors/auth-err');
 
@@ -26,8 +25,6 @@ module.exports = (req, res, next) => {
   }
 
   req.user = payload; // записываем пейлоуд в объект запроса
-
-  console.log(token);
 
   next(); // пропускаем запрос дальше
 };
