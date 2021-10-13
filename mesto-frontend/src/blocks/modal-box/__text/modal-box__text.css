@@ -1,0 +1,19 @@
+.modal-box__text {
+    max-width: 244px;
+    font-weight: 900;
+    font-size: 20px;
+    line-height: 24px;
+    color: #000000;
+    margin-top: 40px;
+    margin-bottom: 0;
+    text-align: center;
+}
+
+@media screen and (min-width: 1280px) {
+    .modal-box__text {
+        max-width: 358px;
+        font-size: 24px;
+        line-height: 29px;
+        margin-top: 32px;
+    }
+}
