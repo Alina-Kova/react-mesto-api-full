@@ -1,14 +1,3 @@
-// const corsOptions = {
-//   origin: [
-//     'http://localhost:3000',
-//     'https://alina.mesto.nomoredomains.monster',
-//     'https://api.alina.mesto.nomoredomains.monster',
-//     'http://alina.mesto.nomoredomains.monster',
-//     'http://api.alina.mesto.nomoredomains.monster',
-//   ],
-//   credentials: true,
-// };
-
 const corsOptions = [
   'http://localhost:3000',
   'https://alina.mesto.nomoredomains.monster',
